@@ -13,19 +13,19 @@ namespace DPSpecial.Tools.ECP.ECPModifyWidth.action
         private void _externalCommandSetWidthWallInvoke()
         {
             SetECPWith(_wallTarget, _viewModel.WCPWidth, _direction);
+            //remove old dim
+            ECPDimensionAction.Remove(_wallPick);
+            //create dim
+            var walls = GetGroupWall(_wallPick, _wallPick.GetTransform().BasisX);
+            if (!walls.Any()) return;
+            var dim = ECPDimensionAction.Create(walls);
+            
             if (_wallTarget == null) return;
+            if (_wallPick == null) return;
             _uidocument.Selection.SetElementIds(new List<ElementId>() { _wallTarget.Id });
             _viewModel.WCPWidthMax = GetECPWithMax(_wallTarget);
             if (_viewModel.WCPWidthMax == 0) return;
             _viewModel.WCPWidth = GetECPWith(_wallTarget);
-            //remove old dim
-            ECPDimensionAction.Remove(_wallTarget);
-            //create dim
-            var walls = GetGroupWall(_wallTarget, _direction);
-            if (!walls.Any()) return;
-            var dim = ECPDimensionAction.Create(walls);
-            //Alight Dim
-            ECPDimensionAction.AlightTextDim(dim, _wallTarget.GetTransform().BasisX.CrossProduct(_document.ActiveView.ViewDirection));
         }
         private void _OkCommand(ECPModifyWidthView view)
         {

@@ -14,6 +14,7 @@ namespace DPSpecial.Tools.ECP.ECPModifyWidth.action
         private ECPModifyWidthView _view;
         private ECPModifyWidthVM _viewModel;
         private FamilyInstance _wallTarget;
+        private FamilyInstance _wallPick;
         private XYZ _direction;
         private CustomExternalCommand _externalCommandSetWidthWall;
         private ExternalEvent _externalEventSetWidthWall;
@@ -44,6 +45,7 @@ namespace DPSpecial.Tools.ECP.ECPModifyWidth.action
             _viewModel.WCPWidth = GetECPWith(w);
             _viewModel.WCPWidthAction = _WCPWidthAction;
             _wallTarget = w;
+            _wallPick = w;
             _uidocument.Selection.SetElementIds(new List<ElementId>() { _wallTarget.Id });
             _view.Show();
         }
