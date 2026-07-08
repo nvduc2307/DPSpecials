@@ -1,0 +1,36 @@
+﻿<Window x:Class="DPSpecial.Tools.ECP.ECPModifyWidth.view.ECPModifyWidthView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DPSpecial.Tools.ECP.ECPModifyWidth.view"
+        mc:Ignorable="d"
+        Title="ECPModifyWidthView" 
+        SizeToContent="Height"
+        ResizeMode="NoResize"
+        MinHeight="100" 
+        x:Name="ECPModifyWidth"
+        Width="200">
+    <StackPanel Margin="10">
+        <StackPanel>
+            <TextBlock Text="Width"/>
+            <TextBox
+                VerticalContentAlignment="Center"
+                Text="{Binding WCPWidth, UpdateSourceTrigger=PropertyChanged, Delay=100}"
+                Height="25"/>
+        </StackPanel>
+        <StackPanel 
+            Margin="0,5,0,0"
+            HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal">
+                <Button
+                    CommandParameter="{Binding ElementName=ECPModifyWidth}"
+                    Command="{Binding OkCommand}"
+                    Cursor="Hand"
+                    Content="OK"
+                    Width="70"
+                    Height="25"/>
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</Window>

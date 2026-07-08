@@ -1,0 +1,401 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <UseWPF>true</UseWPF>
+        <UseWindowsForms>true</UseWindowsForms>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <PlatformTarget>x64</PlatformTarget>
+        <ImplicitUsings>true</ImplicitUsings>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+        <Configurations>Debug R21;Debug R22;Debug R23;Debug R24;Debug R25;Debug R26;Debug R27;Release R21;Release R22;Release R23;Release R24;Release R25;Release R26;Debug R27;Release R27;Release R27</Configurations>
+        <Configurations>$(Configurations);Release R21;Release R22;Release R23;Release R24;Release R25;Release R26;Release R27</Configurations>
+    </PropertyGroup>
+
+    <!-- Revit configuration -->
+    <PropertyGroup Condition="$(Configuration.Contains('R21'))">
+        <RevitVersion>2021</RevitVersion>
+        <TargetFramework>net48</TargetFramework>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('R22'))">
+        <RevitVersion>2022</RevitVersion>
+        <TargetFramework>net48</TargetFramework>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('R23'))">
+        <RevitVersion>2023</RevitVersion>
+        <TargetFramework>net48</TargetFramework>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('R24'))">
+        <RevitVersion>2024</RevitVersion>
+        <TargetFramework>net48</TargetFramework>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('R25'))">
+        <RevitVersion>2025</RevitVersion>
+        <TargetFramework>net8.0-windows</TargetFramework>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('R26'))">
+        <RevitVersion>2026</RevitVersion>
+        <TargetFramework>net8.0-windows</TargetFramework>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('R27'))">
+      <RevitVersion>2027</RevitVersion>
+      <TargetFramework>net10.0-windows</TargetFramework>
+    </PropertyGroup>
+
+    <!-- Launch configuration -->
+    <PropertyGroup>
+        <StartAction>Program</StartAction>
+        <StartProgram>C:\Program Files\Autodesk\Revit $(RevitVersion)\Revit.exe</StartProgram>
+        <StartArguments>/language ENG</StartArguments>
+    </PropertyGroup>
+
+    <!-- Build configuration -->
+    <!-- https://github.com/Nice3point/Revit.Build.Tasks -->
+    <PropertyGroup>
+        <IsRepackable>false</IsRepackable>
+        <DeployRevitAddin>true</DeployRevitAddin>
+    </PropertyGroup>
+    <ItemGroup>
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-10060A.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5045A.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5050A.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5060A.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60100A.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60120A.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6045A.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6050A.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6060T.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6080A.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6090B1.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7550A.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7560A.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7580A.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7590B1.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH6060A.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNY45-10059.rfa" />
+      <None Remove="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6040B1  %28タイル接着剤張用）.rfa" />
+      <None Remove="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6050B1（タイル接着剤張用）.rfa" />
+      <None Remove="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6059B1（タイル接着剤張用）.rfa" />
+      <None Remove="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6060B1（タイル接着剤張用）.rfa" />
+      <None Remove="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6090B2  %28タイル接着剤張用）.rfa" />
+      <None Remove="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-7560B1（タイル接着剤張用）.rfa" />
+      <None Remove="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-10260B1.rfa" />
+      <None Remove="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-62121A.rfa" />
+      <None Remove="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6240B1.rfa" />
+      <None Remove="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6250B1.rfa" />
+      <None Remove="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6256A.rfa" />
+      <None Remove="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6259A.rfa" />
+      <None Remove="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6260B1.rfa" />
+      <None Remove="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6290B1.rfa" />
+      <None Remove="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6556A.rfa" />
+      <None Remove="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-7760B1.rfa" />
+      <None Remove="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-7790B1.rfa" />
+      <None Remove="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNTW-10260B1.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-6030S3.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-6060S6.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-6230S3.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-6245S5.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-7560S6.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6030S3K.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6045S5K.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6050S6K.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6060S7K.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6250S6.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6260S7.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7545S5K.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7550S6K.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7560S7K.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7745S5.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7750S6.rfa" />
+      <None Remove="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7760S7.rfa" />
+      <None Remove="Resources\Families\ECP\０５．DECF、ボンサイMNF-140930\ECP_MNF-2550A7.rfa" />
+      <None Remove="Resources\Families\ECP\０５．DECF、ボンサイMNF-140930\ECP_MNF-3530.rfa" />
+      <None Remove="Resources\Families\ECP\０５．DECF、ボンサイMNF-140930\ECP_MNF-6030.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNE-7560A.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNG-6260A.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNH-7560D.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNP1-7560みなも.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNP2-7560なごみ.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNP3-10060やまなみ.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNP4-7560なぎさ.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY50-8560.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY56-7560.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY58-9060.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY60-7060.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY60-7553.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY60-7560%28ハイレーン%29.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY60-7590.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY61-7560%28リップル%29.rfa" />
+      <None Remove="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY61-7590.rfa" />
+      <None Remove="Resources\Families\ECP\１１．デザイン留役物-2023.913\MNY60-7560CN ﾊｲﾚｰﾝ留め\ECP_MNY60-7560CN　ﾊｲﾚｰﾝ留め.rfa" />
+      <None Remove="Resources\Families\ECP\１１．デザイン留役物-2023.913\MNY61-7560CN ﾘｯﾌﾟﾙ留め\ECP_MNY61-7560CN　ﾘｯﾌﾟﾙ留め.rfa" />
+      <None Remove="Resources\Parameters\ShareParameterBricsWall.txt" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-10060A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5045A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5050A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5060A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60100A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60120A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6045A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6050A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6060T.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6080A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6090B1.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7550A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7560A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7580A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7590B1.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH6060A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNY45-10059.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6040B1  (タイル接着剤張用）.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6050B1（タイル接着剤張用）.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6059B1（タイル接着剤張用）.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6060B1（タイル接着剤張用）.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6090B2  (タイル接着剤張用）.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-7560B1（タイル接着剤張用）.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-10260B1.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-62121A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6240B1.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6250B1.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6256A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6259A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6260B1.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6290B1.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-6556A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-7760B1.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNT-7790B1.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０３．タイルベースMNT-140930\ECP_MNTW-10260B1.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-6030S3.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-6060S6.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-6230S3.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-6245S5.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-7560S6.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6030S3K.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6045S5K.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6050S6K.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6060S7K.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6250S6.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6260S7.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7545S5K.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7550S6K.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7560S7K.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7745S5.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7750S6.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7760S7.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０５．DECF、ボンサイMNF-140930\ECP_MNF-2550A7.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０５．DECF、ボンサイMNF-140930\ECP_MNF-3530.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０５．DECF、ボンサイMNF-140930\ECP_MNF-6030.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNE-7560A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNG-6260A.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNH-7560D.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNP1-7560みなも.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNP2-7560なごみ.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNP3-10060やまなみ.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNP4-7560なぎさ.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY50-8560.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY56-7560.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY58-9060.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY60-7060.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY60-7553.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY60-7560(ハイレーン).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY60-7590.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY61-7560(リップル).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０７．デザインMNY-50-61-140930\ECP_MNY61-7590.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\１１．デザイン留役物-2023.913\MNY60-7560CN ﾊｲﾚｰﾝ留め\ECP_MNY60-7560CN　ﾊｲﾚｰﾝ留め.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\１１．デザイン留役物-2023.913\MNY61-7560CN ﾘｯﾌﾟﾙ留め\ECP_MNY61-7560CN　ﾘｯﾌﾟﾙ留め.rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Parameters\ShareParameterBricsWall.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Revit References -->
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+        <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*" />
+        <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="3.0.1" />
+        <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*" />
+        <PackageReference Include="Nice3point.Revit.Extensions" Version="$(RevitVersion).*" />
+        <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
+        <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
+
+        <!-- MVVM -->
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+      <Reference Include="System.Windows.Forms" />
+      <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" NoWarn="NU1605" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+      <PackageReference Include="MicrosoftOfficeCore" Version="15.0.0" NoWarn="NU1701" />
+      <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" NoWarn="NU1605" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
+      <PackageReference Include="MicrosoftOfficeCore" Version="15.0.0" NoWarn="NU1701" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Resource Include="Resources\Icons\RibbonIcon16.png" />
+        <Resource Include="Resources\Icons\RibbonIcon32.png" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Resources\Families\ECP\０６．コーナーMNY-3-45-140930\" />
+      <Folder Include="Resources\Families\ECP\０８．シャオンMNH-S-140930\" />
+      <Folder Include="Resources\Families\ECP\０９．シャオンMNK-140930\" />
+      <Folder Include="Resources\Families\ECP\１０．屋上目隠し壁（鉄線入り）\" />
+      <Folder Include="Resources\Families\ECP\１１．デザイン留役物-2023.913\MNY62-7560CD ﾘﾌﾚｲﾝ留め\" />
+      <Folder Include="Resources\Families\ECP\１１．デザイン留役物-2023.913\MNY62-7560CS ﾘﾌﾚｲﾝ留め\" />
+      <Folder Include="Tools\ALC\" />
+    </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="Build">
+    <Exec Command="xcopy &quot;$(TargetDir)publish\Revit $(RevitVersion) $(Configuration) addin\*&quot; &quot;$(ProjectDir)..\..\InnoSetup\Content\$(RevitVersion)\&quot; /E /H /C /I /K /D /Y" />
+  </Target>
+</Project>
