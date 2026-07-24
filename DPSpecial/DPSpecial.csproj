@@ -27,6 +27,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="$(Configuration.Contains('R24'))">
         <RevitVersion>2024</RevitVersion>
+        <RevitApiVersion>2024.3.30</RevitApiVersion>
+        <RevitExtensionsVersion>2024.3.0</RevitExtensionsVersion>
         <TargetFramework>net48</TargetFramework>
     </PropertyGroup>
     <PropertyGroup Condition="$(Configuration.Contains('R25'))">
@@ -40,6 +42,10 @@
     <PropertyGroup Condition="$(Configuration.Contains('R27'))">
       <RevitVersion>2027</RevitVersion>
       <TargetFramework>net10.0-windows</TargetFramework>
+    </PropertyGroup>
+    <PropertyGroup>
+        <RevitApiVersion Condition="'$(RevitApiVersion)' == ''">$(RevitVersion).*</RevitApiVersion>
+        <RevitExtensionsVersion Condition="'$(RevitExtensionsVersion)' == ''">$(RevitVersion).*</RevitExtensionsVersion>
     </PropertyGroup>
 
     <!-- Launch configuration -->
@@ -360,12 +366,12 @@
         <!-- Revit References -->
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-        <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*" />
+        <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitApiVersion)" />
         <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="3.0.1" />
         <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*" />
-        <PackageReference Include="Nice3point.Revit.Extensions" Version="$(RevitVersion).*" />
-        <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
-        <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
+        <PackageReference Include="Nice3point.Revit.Extensions" Version="$(RevitExtensionsVersion)" />
+        <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitApiVersion)" />
+        <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitApiVersion)" />
 
         <!-- MVVM -->
     </ItemGroup>
@@ -396,6 +402,6 @@
       <Folder Include="Tools\ALC\" />
     </ItemGroup>
   <Target Name="PostBuild" AfterTargets="Build">
-    <Exec Command="xcopy &quot;$(TargetDir)publish\Revit $(RevitVersion) $(Configuration) addin\*&quot; &quot;$(ProjectDir)..\..\InnoSetup\Content\$(RevitVersion)\&quot; /E /H /C /I /K /D /Y" />
+    <Exec Command="xcopy &quot;$(TargetDir)publish\Revit $(RevitVersion) $(Configuration) addin\*&quot; &quot;$(ProjectDir)..\..\InnoSetup\Content\$(RevitVersion)\&quot; /E /H /C /I /K /Y" />
   </Target>
 </Project>

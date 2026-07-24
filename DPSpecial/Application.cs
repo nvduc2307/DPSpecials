@@ -16,6 +16,7 @@ namespace DPSpecial
         {
             CreateRibbonGeneral();
             CreateRibbonECP();
+            CreateRibbonECPSchedule();
         }
         private void CreateRibbonGeneral()
         {
@@ -40,6 +41,12 @@ namespace DPSpecial
             panel.AddPushButton<ECPModifyWidthCmd>("Modify")
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
+        }
+        private void CreateRibbonECPSchedule()
+        {
+            var panel = Application.CreatePanel("ECP Schedule", "DPSpecial");
+
+            
         }
     }
 }
