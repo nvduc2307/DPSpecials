@@ -37,6 +37,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="$(Configuration.Contains('R26'))">
         <RevitVersion>2026</RevitVersion>
+        <RevitApiVersion>2026.4.0</RevitApiVersion>
+        <RevitExtensionsVersion>2026.1.0</RevitExtensionsVersion>
         <TargetFramework>net8.0-windows</TargetFramework>
     </PropertyGroup>
     <PropertyGroup Condition="$(Configuration.Contains('R27'))">
@@ -138,6 +140,7 @@
       <None Remove="Resources\Families\ECP\１１．デザイン留役物-2023.913\MNY60-7560CN ﾊｲﾚｰﾝ留め\ECP_MNY60-7560CN　ﾊｲﾚｰﾝ留め.rfa" />
       <None Remove="Resources\Families\ECP\１１．デザイン留役物-2023.913\MNY61-7560CN ﾘｯﾌﾟﾙ留め\ECP_MNY61-7560CN　ﾘｯﾌﾟﾙ留め.rfa" />
       <None Remove="Resources\Parameters\ShareParameterBricsWall.txt" />
+      <None Remove="Resources\Template\ShapeWallECP_Template.rte" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-10060A.rfa">
@@ -360,6 +363,9 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Parameters\ShareParameterBricsWall.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Template\ShapeWallECP_Template.rte">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
