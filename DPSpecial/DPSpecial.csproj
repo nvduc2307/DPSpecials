@@ -41,6 +41,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="$(Configuration.Contains('R27'))">
       <RevitVersion>2027</RevitVersion>
+      <RevitApiVersion>2027.0.10</RevitApiVersion>
+      <RevitExtensionsVersion>2027.0.0</RevitExtensionsVersion>
       <TargetFramework>net10.0-windows</TargetFramework>
     </PropertyGroup>
     <PropertyGroup>
@@ -244,55 +246,55 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-6030S3.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-6060S6.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-6230S3.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-6245S5.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNFK-7560S6.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6030S3K.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6045S5K.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6050S6K.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6060S7K.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6250S6.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-6260S7.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7545S5K.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7550S6K.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7560S7K.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7745S5.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7750S6.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０４．ルーバーMNLK-140930\ECP_MNLK-7760S7.rfa">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０５．DECF、ボンサイMNF-140930\ECP_MNF-2550A7.rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -393,12 +395,6 @@
     </ItemGroup>
     
     <ItemGroup>
-      <Folder Include="Resources\Families\ECP\０６．コーナーMNY-3-45-140930\" />
-      <Folder Include="Resources\Families\ECP\０８．シャオンMNH-S-140930\" />
-      <Folder Include="Resources\Families\ECP\０９．シャオンMNK-140930\" />
-      <Folder Include="Resources\Families\ECP\１０．屋上目隠し壁（鉄線入り）\" />
-      <Folder Include="Resources\Families\ECP\１１．デザイン留役物-2023.913\MNY62-7560CD ﾘﾌﾚｲﾝ留め\" />
-      <Folder Include="Resources\Families\ECP\１１．デザイン留役物-2023.913\MNY62-7560CS ﾘﾌﾚｲﾝ留め\" />
       <Folder Include="Tools\ALC\" />
     </ItemGroup>
   <Target Name="PostBuild" AfterTargets="Build">

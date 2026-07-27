@@ -8,8 +8,4 @@
         <VendorDescription></VendorDescription>
         <VendorEmail></VendorEmail>
     </AddIn>
-    <ManifestSettings>
-        <UseRevitContext>False</UseRevitContext>
-        <ContextName>DPSpecial</ContextName>
-    </ManifestSettings>
 </RevitAddIns>
