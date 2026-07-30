@@ -113,6 +113,8 @@ namespace DPSpecial.Tools.ECP.ECPCreate.action
         }
         private void CreateWall(XYZ sp, XYZ ep)
         {
+            if (sp == null) return;
+            if (ep == null) return;
             if (_viewModel.ECPFamily == null) return;
             var dir = (ep - sp).Normalize();
             var angle = dir.Y >=0 
