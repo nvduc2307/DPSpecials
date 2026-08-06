@@ -2,6 +2,7 @@
 using DPSpecial.Tools.ECP.ECPCreate;
 using DPSpecial.Tools.ECP.ECPFamilyImport;
 using DPSpecial.Tools.ECP.ECPModifyWidth;
+using DPSpecial.Tools.ECP.ECPSchedule.ECPShapes;
 using Nice3point.Revit.Extensions.UI;
 using Nice3point.Revit.Toolkit.External;
 
@@ -46,7 +47,10 @@ namespace DPSpecial
         {
             var panel = Application.CreatePanel("ECP Schedule", "DPSpecial");
 
-            
+            panel.AddPushButton<ECPShapeCmd>("shape")
+                .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
+                .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
+
         }
     }
 }

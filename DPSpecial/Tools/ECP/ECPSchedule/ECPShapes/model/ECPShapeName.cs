@@ -1,4 +1,4 @@
-﻿namespace DPSpecial.Tools.ECP.ECPSchedule.ECPShapes
+﻿namespace DPSpecial.Tools.ECP.ECPSchedule.ECPShapes.model
 {
     public class ECPShapeName
     {

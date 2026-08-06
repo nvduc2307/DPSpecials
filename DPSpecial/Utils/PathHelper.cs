@@ -14,7 +14,7 @@ namespace DPSpecial.Utils
         }
         public static string Templates
         {
-            get => $"{AssemblyDirectory}\\Resources\\Templates";
+            get => $"{AssemblyDirectory}\\Resources\\Template";
         }
         public static string Datas
         {
