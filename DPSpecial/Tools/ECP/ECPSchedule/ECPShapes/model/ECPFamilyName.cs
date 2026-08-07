@@ -4,31 +4,45 @@
     {
         public static List<string> ECPFamilyNameNormal = new List<string>()
         {
-            "ECP_MNH-10060A",
-            "ECP_MNH6060A",
-            "ECP_MNY45-10059",
-            "ECP_MNH-60120A",
-            "ECP_MNH-7590B1",
-            "ECP_MNH-7580A",
-            "ECP_MNH-7550A",
-            "ECP_MNH-6090B1",
-            "ECP_MNH-6080A",
-            "ECP_MNH-6050A",
-            "ECP_MNH-6045A",
-            "ECP_MNH-5050A",
-            "ECP_MNH-5045A",
-            "ECP_MNH-60100A",
-            "ECP_MNH-7560A",
-            "ECP_MNH-5060A",
-            "ECP_MNH6060A",
-            "ECP_MNH-6060T",
+            "ECP_MNH-5045A(メス側カット)",
+            "ECP_MNH-5060A(メス側カット)",
+            "ECP_MNH-6045A(メス側カット)",
+            "ECP_MNH-6050A(メス側カット)",
+            "ECP_MNH6060A(メス側カット)",
+            "ECP_MNH-6060T(メス側カット)",
+            "ECP_MNH-6080A(メス側カット)",
+            "ECP_MNH-6090B1(メス側カット)",
+            "ECP_MNH-7550A(メス側カット)",
+            "ECP_MNH-7560A(メス側カット)",
+            "ECP_MNH-7580A(メス側カット)",
+            "ECP_MNH-7590B1(メス側カット)",
+            "ECP_MNH-10060A(メス側カット)",
+            "ECP_MNH-60100A(メス側カット)",
+            "ECP_MNH-60120A(メス側カット)",
         };
         public static List<string> ECPFamilyNameNotArrow = new List<string>()
         {
+            "ECP_MNH-5045A(オス側カット)",
+            "ECP_MNH-5050A(オス側カット)",
+            "ECP_MNH-5060A(オス側カット)",
+            "ECP_MNH-6045A(オス側カット)",
+            "ECP_MNH-6050A(オス側カット)",
+            "ECP_MNH6060A(オス側カット)",
+            "ECP_MNH-6060T(オス側カット)",
+            "ECP_MNH-6080A(オス側カット)",
+            "ECP_MNH-6090B1(オス側カット)",
+            "ECP_MNH-7550A(オス側カット)",
+            "ECP_MNH-7560A(オス側カット)",
+            "ECP_MNH-7580A(オス側カット)",
+            "ECP_MNH-7590B1(オス側カット)",
+            "ECP_MNH-10060A(オス側カット)",
+            "ECP_MNH-60100A(オス側カット)",
+            "ECP_MNH-60120A(オス側カット)",
         };
         public static List<string> ECPFamilyNameSpecial = new List<string>()
         {
-            "ECP_MNY45ー6058"
+            "ECP_MNH-60120A(オス側カット)",
+            "ECP_MNY45ー6058(メス側カット)"
         };
     }
 }

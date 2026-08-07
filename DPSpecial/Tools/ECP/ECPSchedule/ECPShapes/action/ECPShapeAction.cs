@@ -24,9 +24,9 @@ namespace DPSpecial.Tools.ECP.ECPSchedule.ECPShapes.action
             ValidateView();
             var walls = GetWallECPs();
             if (!walls.Any()) return;
-
             using (var ts = new Transaction(_document, "new transaction"))
             {
+                ts.SkipAllWarnings();
                 ts.Start();
                 foreach (var wall in walls)
                 {
@@ -68,7 +68,6 @@ namespace DPSpecial.Tools.ECP.ECPSchedule.ECPShapes.action
                 }
                 ts.Commit();
             }
-
         }
         private void ValidateView()
         {
@@ -106,16 +105,16 @@ namespace DPSpecial.Tools.ECP.ECPSchedule.ECPShapes.action
             if (isWallHasArrow)
             {
                 if(tranfs.BasisX.DotProduct(view.RightDirection) > 0)
-                    result = width < widthMax ? ECPShapeName.ER3 : ECPShapeName.ER0;
-                else
                     result = width < widthMax ? ECPShapeName.EL3 : ECPShapeName.EL0;
+                else
+                    result = width < widthMax ? ECPShapeName.ER3 : ECPShapeName.ER0;
             }
             if (isWallHasNotArrow)
             {
                 if (tranfs.BasisX.DotProduct(view.RightDirection) > 0)
-                    result = width < widthMax ? ECPShapeName.ER5 : ECPShapeName.ER1;
-                else
                     result = width < widthMax ? ECPShapeName.EL5 : ECPShapeName.EL1;
+                else
+                    result = width < widthMax ? ECPShapeName.ER5 : ECPShapeName.ER1;
             }
             return result;
         }

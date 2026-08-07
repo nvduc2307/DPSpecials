@@ -211,6 +211,7 @@ namespace DPSpecial.Tools.ECP.ECPCreate.action
         }
         private void _CancelCommand()
         {
+            _view.Close();
         }
         private void _ECPGapAction()
         {

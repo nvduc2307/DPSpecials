@@ -66,23 +66,40 @@
         <DeployRevitAddin>true</DeployRevitAddin>
     </PropertyGroup>
     <ItemGroup>
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-10060A.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5045A.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5050A.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5060A.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60100A.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60120A.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6045A.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6050A.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6060T.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6080A.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6090B1.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7550A.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7560A.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7580A.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7590B1.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH6060A.rfa" />
-      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNY45-10059.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-10060A%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-10060A%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5045A%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5045A%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5050A%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5050A%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5060A%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5060A%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60100A%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60100A%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60120A%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60120A%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6045A%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6045A%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6050A%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6050A%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6060T%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6060T%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6080A%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6080A%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6090B1%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6090B1%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7550A%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7550A%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7560A%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7560A%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7580A%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7580A%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7590B1%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7590B1%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH6060A%28オス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH6060A%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNY45-10059%28メス側カット%29.rfa" />
+      <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNY45ー6058%28メス側カット%29.rfa" />
       <None Remove="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6040B1  %28タイル接着剤張用）.rfa" />
       <None Remove="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6050B1（タイル接着剤張用）.rfa" />
       <None Remove="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6059B1（タイル接着剤張用）.rfa" />
@@ -143,55 +160,106 @@
       <None Remove="Resources\Template\ShapeWallECP_Template.rte" />
     </ItemGroup>
     <ItemGroup>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-10060A.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-10060A(オス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5045A.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-10060A(メス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5050A.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5045A(オス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5060A.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5045A(メス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60100A.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5050A(オス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60120A.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5050A(メス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6045A.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5060A(オス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6050A.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-5060A(メス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6060T.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60100A(オス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6080A.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60100A(メス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6090B1.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60120A(オス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7550A.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-60120A(メス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7560A.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6045A(オス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7580A.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6045A(メス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7590B1.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6050A(オス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH6060A.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6050A(メス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNY45-10059.rfa">
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6060T(オス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6060T(メス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6080A(オス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6080A(メス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6090B1(オス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-6090B1(メス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7550A(オス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7550A(メス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7560A(オス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7560A(メス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7580A(オス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7580A(メス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7590B1(オス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-7590B1(メス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH6060A(オス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH6060A(メス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNY45-10059(メス側カット).rfa">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNY45ー6058(メス側カット).rfa">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <Content Include="Resources\Families\ECP\０２．フラットタイルMNH-B-140930\ECP_MNH-6040B1  (タイル接着剤張用）.rfa">
