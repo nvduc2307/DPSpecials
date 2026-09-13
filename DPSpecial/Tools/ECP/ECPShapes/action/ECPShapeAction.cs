@@ -1,12 +1,12 @@
 ﻿using Autodesk.Revit.UI;
 using DPSpecial.MVVM.Models;
-using DPSpecial.Tools.ECP.ECPSchedule.ECPShapes.model;
-using DPSpecial.Tools.ECP.ECPSchedule.ECPShapes.schema;
+using DPSpecial.Tools.ECP.ECPShapes.model;
+using DPSpecial.Tools.ECP.ECPShapes.schema;
 using DPSpecial.Utils;
 using Nice3point.Revit.Extensions.Runtime;
 using System.Windows;
 
-namespace DPSpecial.Tools.ECP.ECPSchedule.ECPShapes.action
+namespace DPSpecial.Tools.ECP.ECPShapes.action
 {
     public class ECPShapeAction
     {

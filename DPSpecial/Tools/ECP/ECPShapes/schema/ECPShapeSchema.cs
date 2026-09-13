@@ -1,6 +1,6 @@
 ﻿using DPSpecial.Cores;
 
-namespace DPSpecial.Tools.ECP.ECPSchedule.ECPShapes.schema
+namespace DPSpecial.Tools.ECP.ECPShapes.schema
 {
     public class ECPShapeSchema : SchemaEntityBase
     {

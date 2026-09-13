@@ -1,0 +1,523 @@
+﻿<Window x:Class="DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.view.ECPCreateScheduleView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.view"
+        mc:Ignorable="d"
+        Title="メース一般受注検索結果一覧(販売店用)"
+        WindowStartupLocation="CenterScreen"
+        Height="760"
+        Width="1500"
+        FontSize="11">
+    <!--
+    JP: タイトル「メース一般受注検索結果一覧(販売店用)」
+    VI: Tiêu đề "Danh sách kết quả tìm kiếm đơn hàng chung Mace (dành cho đại lý)"
+    EN: Title "Mace general order search result list (for dealer)"
+    -->
+    <Window.Resources>
+        <SolidColorBrush x:Key="NormalRowBrush" Color="#ABE7EE"/>
+
+        <Style x:Key="HeaderTopText" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="HeaderBottomText" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="10"/>
+        </Style>
+        <Style x:Key="HeaderTopTextRed" TargetType="TextBlock" BasedOn="{StaticResource HeaderTopText}">
+            <Setter Property="Foreground" Value="Red"/>
+        </Style>
+
+        <Style x:Key="CellTopText" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="2,1,4,0"/>
+        </Style>
+        <Style x:Key="CellBottomText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="2,0,4,1"/>
+        </Style>
+        <Style x:Key="CellTopTextLeft" TargetType="TextBlock" BasedOn="{StaticResource CellTopText}">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        <Style x:Key="CellBottomTextLeft" TargetType="TextBlock" BasedOn="{StaticResource CellBottomText}">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        <Style x:Key="CellBottomTextRed" TargetType="TextBlock" BasedOn="{StaticResource CellBottomText}">
+            <Setter Property="Foreground" Value="Red"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!--
+        JP: 検索条件パネル
+        VI: Khung điều kiện tìm kiếm
+        EN: Search filter panel
+        -->
+        <Border Grid.Row="0" BorderBrush="Gray" BorderThickness="1" Padding="8" Margin="0,0,0,6">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="230"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="180"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- JP:物件名称 | VI:Tên công trình | EN:Property name -->
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="物件名称" VerticalAlignment="Center" Margin="0,0,6,6"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding PropertyName, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,10,6" VerticalContentAlignment="Center"/>
+
+                <!-- JP:販売店名称 | VI:Tên đại lý bán hàng | EN:Dealer name -->
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="販売店名称" VerticalAlignment="Center" Margin="0,0,6,6"/>
+                <StackPanel Grid.Row="0" Grid.Column="3" Margin="0,0,10,6">
+                    <TextBox Text="{Binding DealerName, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalContentAlignment="Center"/>
+                    <!-- JP:販売店名称の2行目（部署名） | VI:Dòng 2 - tên bộ phận | EN:Line 2 - division name -->
+                    <TextBlock Text="{Binding DealerDivision}" FontSize="10" Foreground="#555555" Margin="2,2,0,0"/>
+                </StackPanel>
+
+                <!-- JP:担当支店 | VI:Chi nhánh phụ trách | EN:Branch office in charge -->
+                <TextBlock Grid.Row="0" Grid.Column="4" Text="担当支店" VerticalAlignment="Center" Margin="0,0,6,6"/>
+                <ComboBox Grid.Row="0" Grid.Column="5" ItemsSource="{Binding BranchOffices}" SelectedItem="{Binding BranchOffice, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,10,6" VerticalAlignment="Top"/>
+
+                <!-- JP:オーダー票 種類（例: "1:オーダー票"） | VI:Loại phiếu đặt hàng | EN:Order slip type -->
+                <ComboBox Grid.Row="0" Grid.Column="7" ItemsSource="{Binding OrderSlipTypes}" SelectedItem="{Binding OrderSlipType, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,0,6" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+
+                <!-- JP:物件詳細 | VI:Chi tiết công trình | EN:Property detail -->
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="物件詳細" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding PropertyDetail, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,10,0" VerticalContentAlignment="Center"/>
+
+                <StackPanel Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <!-- JP:検索 | VI:Tìm kiếm | EN:Search -->
+                    <Button Content="検索" Command="{Binding SearchCommand}" Width="70" Height="25"/>
+                    <!-- JP:全チェックON | VI:Chọn tất cả | EN:Check all on -->
+                    <Button Content="全チェックON" Command="{Binding CheckAllOnCommand}" Width="90" Height="25" Margin="10,0,0,0"/>
+                    <!-- JP:全チェックOFF | VI:Bỏ chọn tất cả | EN:Check all off -->
+                    <Button Content="全チェックOFF" Command="{Binding CheckAllOffCommand}" Width="90" Height="25" Margin="5,0,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!--
+        JP: 検索結果一覧グリッド
+        VI: Lưới dữ liệu kết quả tìm kiếm
+        EN: Search result grid
+        NOTE (VI/EN): Thứ tự/ghép cặp một vài cột (đặc biệt quanh "加工出荷予定日/実績日" và "変更期日/変更不可")
+        được suy đoán lại từ ảnh gốc và có thể chưa chính xác 100% — cần đối chiếu lại với ảnh gốc.
+        A few columns (especially around "加工出荷予定日/実績日" and "変更期日/変更不可") are best-effort
+        reconstructions from the screenshot and may not be pixel-accurate — please re-check against the source image.
+        -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding Orders}"
+                  AutoGenerateColumns="False"
+                  CanUserSortColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  CanUserResizeRows="False"
+                  HeadersVisibility="Column"
+                  GridLinesVisibility="All"
+                  HorizontalGridLinesBrush="#B0B0B0"
+                  VerticalGridLinesBrush="#B0B0B0"
+                  RowHeight="40"
+                  ColumnHeaderHeight="36"
+                  ColumnWidth="*"
+                  FontSize="11"
+                  SelectionMode="Single"
+                  HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto"
+                  AlternationCount="2">
+            <!--
+            JP: 偶数行=白, 奇数行=現在の水色（AlternationCount="2" + AlternationIndexトリガーで切替）。
+                先頭行のハイライト機能は削除済み（ユーザー指示）。
+            VI: Dòng chẵn = trắng, dòng lẻ = màu xanh cyan hiện tại (dùng AlternationCount="2" +
+                trigger theo AlternationIndex). Đã bỏ tính năng highlight dòng đầu theo yêu cầu.
+            EN: Even rows = white, odd rows = the current cyan color (via AlternationCount="2" +
+                an AlternationIndex trigger). The first-row highlight feature has been removed per request.
+            -->
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="White"/>
+                    <Style.Triggers>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                            <Setter Property="Background" Value="{StaticResource NormalRowBrush}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <!--
+                JP:オーダー票印刷（印刷対象を選ぶチェック） - チェックボックスを行の縦中央に配置
+                VI:In phiếu đặt hàng (chọn dòng để in) - căn checkbox giữa dòng theo phương đứng
+                EN:Print order slip (row selection for printing) - checkbox centered vertically in the row
+                -->
+                <DataGridCheckBoxColumn Binding="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}" Width="40">
+                    <DataGridCheckBoxColumn.Header>
+                        <!--
+                        JP:ヘッダーのチェックボックス。ユーザーがクリックした時はON/OFFの2状態のみを行き来する
+                           （IsThreeState="False"はクリックによる切り替えのみを2状態に制限し、コードからの
+                           null代入は妨げない）。行を一部だけチェックした時はコード側(SetIsAllCheckedFromRows)が
+                           IsAllCheckedにnullを設定し、その時だけ不確定（3番目の状態）の見た目になる。
+                           DataGridColumn.Header の内容は通常のバインディング経由でウィンドウのDataContextを
+                           継承しないことがあるため、DataGridを明示的にRelativeSourceで辿ってDataContextを取得する。
+                        VI:Checkbox ở header. Khi NGƯỜI DÙNG bấm, chỉ chuyển qua lại giữa 2 trạng thái ON/OFF
+                           (IsThreeState="False" chỉ giới hạn việc CLICK xoay vòng 2 trạng thái, không cản việc
+                           code gán giá trị null). Khi người dùng chỉ check một phần dòng, code
+                           (SetIsAllCheckedFromRows) sẽ gán null vào IsAllChecked, lúc đó mới hiện trạng thái
+                           thứ 3 (gạch ngang/không xác định).
+                           Nội dung Header của DataGridColumn không phải lúc nào cũng tự kế thừa DataContext của Window
+                           qua binding thông thường, nên phải trỏ tường minh qua RelativeSource tới DataGrid rồi lấy DataContext.
+                        EN:Header checkbox. A USER click only toggles between the ON/OFF states
+                           (IsThreeState="False" limits CLICK cycling to 2 states only; it does not block
+                           code from assigning null). When the user checks only some rows, code
+                           (SetIsAllCheckedFromRows) sets IsAllChecked to null, and only then does the
+                           indeterminate (3rd) state appear.
+                           A DataGridColumn.Header's content does not reliably inherit the Window's DataContext through a
+                           plain Binding, so it walks up explicitly via RelativeSource to the DataGrid and reads its DataContext.
+                        -->
+                        <CheckBox HorizontalAlignment="Center"
+                                  IsThreeState="False"
+                                  IsChecked="{Binding DataContext.IsAllChecked, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Mode=TwoWay}"/>
+                    </DataGridCheckBoxColumn.Header>
+                    <!--
+                    JP: DataGridColumnHeader既定のHorizontalContentAlignmentはLeftのため、CheckBox側のCenter指定だけでは効かない
+                        → ヘッダー自体をCenterにする必要がある
+                    VI: HorizontalContentAlignment mặc định của DataGridColumnHeader là Left, nên chỉ set Center trên CheckBox
+                        không đủ → phải set Center ngay trên chính header
+                    EN: DataGridColumnHeader's default HorizontalContentAlignment is Left, so Center on the CheckBox alone
+                        has no effect → the header itself must be set to Center
+                    -->
+                    <DataGridCheckBoxColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridCheckBoxColumn.HeaderStyle>
+                    <DataGridCheckBoxColumn.ElementStyle>
+                        <Style TargetType="CheckBox">
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridCheckBoxColumn.ElementStyle>
+                    <DataGridCheckBoxColumn.EditingElementStyle>
+                        <Style TargetType="CheckBox">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridCheckBoxColumn.EditingElementStyle>
+                </DataGridCheckBoxColumn>
+
+                <!-- JP:受注No / 物件登録No | VI:Số đơn hàng / Số đăng ký công trình | EN:Order No / Property registration No -->
+                <DataGridTemplateColumn Width="95">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="受注No" HorizontalAlignment="Left" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text="物件登録No" Style="{StaticResource HeaderBottomText}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding OrderNo}" HorizontalAlignment="Left" Style="{StaticResource CellTopText}"/>
+                                <TextBlock Text="{Binding PropertyRegNo}" HorizontalAlignment="Left" Style="{StaticResource CellBottomText}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- JP:物件名称 / 物件詳細 | VI:Tên công trình / Chi tiết công trình | EN:Property name / Property detail -->
+                <DataGridTemplateColumn Width="300">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="物件名称" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text="物件詳細" Style="{StaticResource HeaderBottomText}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding PropertyName}" Style="{StaticResource CellTopTextLeft}"/>
+                                <TextBlock Text="{Binding PropertyDetail}" Style="{StaticResource CellBottomTextLeft}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- JP:販売店名称（1行のみ、部署名は検索欄側に表示） | VI:Tên đại lý (chỉ 1 dòng, tên bộ phận hiển thị ở ô tìm kiếm) | EN:Dealer name (single line; division shown in the search field) -->
+                <DataGridTemplateColumn Width="150">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="販売店名称" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text=" " Style="{StaticResource HeaderBottomText}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DealerName}" Style="{StaticResource CellTopTextLeft}" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- JP:基材m² / 基材重量 | VI:Diện tích / Khối lượng vật liệu nền | EN:Base material area / weight -->
+                <DataGridTemplateColumn Width="70">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="基材m&#xB2;" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text="基材重量" Style="{StaticResource HeaderBottomText}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding BaseAreaM2}" Style="{StaticResource CellTopText}"/>
+                                <TextBlock Text="{Binding BaseWeight}" Style="{StaticResource CellBottomText}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- JP:働きm² / 働き重量 | VI:Diện tích / Khối lượng thi công | EN:Working area / weight -->
+                <DataGridTemplateColumn Width="70">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="働きm&#xB2;" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text="働き重量" Style="{StaticResource HeaderBottomText}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding WorkAreaM2}" Style="{StaticResource CellTopText}"/>
+                                <TextBlock Text="{Binding WorkWeight}" Style="{StaticResource CellBottomText}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- JP:役物m² / 実枚 | VI:Diện tích phụ kiện / Số tấm thực tế | EN:Accessory area / actual sheets -->
+                <DataGridTemplateColumn Width="65">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="役物m&#xB2;" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text="実枚" Style="{StaticResource HeaderBottomText}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding AccessoryAreaM2}" Style="{StaticResource CellTopText}"/>
+                                <TextBlock Text="{Binding ActualSheets}" Style="{StaticResource CellBottomText}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- JP:希望納期 / 現場到着予定日 | VI:Ngày giao mong muốn / Ngày dự kiến đến công trường | EN:Desired delivery date / scheduled site arrival date -->
+                <DataGridTemplateColumn Width="85">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="希望納期" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text="現場到着予定日" Style="{StaticResource HeaderBottomText}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding DesiredDeliveryDate}" Style="{StaticResource CellTopText}"/>
+                                <TextBlock Text="{Binding SiteArrivalDate}" Style="{StaticResource CellBottomText}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- JP:加工出荷予定日 / 加工到着予定日 | VI:Ngày dự kiến xuất/đến gia công | EN:Scheduled processing ship date / scheduled processing arrival date -->
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="加工出荷予定日" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text="加工到着予定日" Style="{StaticResource HeaderBottomText}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding ProcessShipScheduledDate}" Style="{StaticResource CellTopText}"/>
+                                <TextBlock Text="{Binding ProcessArrivalScheduledDate}" Style="{StaticResource CellBottomText}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!--
+                JP:工場出荷予定日（黒字・1行目） / 変更期日（赤字・2行目） - データは 工場出荷予定日の値 / 変更不可 の注記
+                VI:Ngày dự kiến xuất xưởng (đen, dòng 1) / Ngày hạn thay đổi (đỏ, dòng 2) - dữ liệu là ngày xuất xưởng / ghi chú "không thể thay đổi"
+                EN:Scheduled factory shipment date (black, line 1) / change deadline (red, line 2) - data shows the ship date / a "cannot be changed" note
+                -->
+                <DataGridTemplateColumn Width="80">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="工場出荷予定日" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text="変更期日" Style="{StaticResource HeaderBottomText}" Foreground="Red"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding FactoryShipScheduledDate}" Style="{StaticResource CellTopText}"/>
+                                <TextBlock Text="{Binding ChangeNotAllowed}" Style="{StaticResource CellBottomTextRed}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- JP:加工出荷実績日 / 工場出荷実績日 | VI:Ngày xuất gia công/xuất xưởng thực tế | EN:Actual processing ship date / actual factory ship date -->
+                <DataGridTemplateColumn Width="85">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="加工出荷実績日" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text="工場出荷実績日" Style="{StaticResource HeaderBottomText}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding ProcessShipActualDate}" Style="{StaticResource CellTopText}"/>
+                                <TextBlock Text="{Binding FactoryShipActualDate}" Style="{StaticResource CellBottomText}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- JP:最終出荷日 / 一時保管 | VI:Ngày xuất hàng cuối / Lưu kho tạm thời | EN:Final shipment date / temporary storage -->
+                <DataGridTemplateColumn Width="75">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="最終出荷日" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text="一時保管" Style="{StaticResource HeaderBottomText}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding FinalShipDate}" Style="{StaticResource CellTopText}"/>
+                                <TextBlock Text="{Binding TemporaryStorage}" Style="{StaticResource CellBottomText}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- JP:納変数 / 内変数 | VI:Số lần thay đổi giao hàng / Số lần thay đổi nội bộ | EN:Delivery change count / internal change count -->
+                <DataGridTemplateColumn Width="55">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="納変数" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text="内変数" Style="{StaticResource HeaderBottomText}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding DeliveryChangeCount}" Style="{StaticResource CellTopText}"/>
+                                <TextBlock Text="{Binding InternalDeform}" Style="{StaticResource CellBottomText}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- JP:製造工場 / 加工工場（1つの列に2行） | VI:Nhà máy sản xuất / Nhà máy gia công (gộp 1 cột 2 dòng) | EN:Manufacturing factory / processing factory (merged into one 2-line column) -->
+                <DataGridTemplateColumn Width="70">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="製造工場" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text="加工工場" Style="{StaticResource HeaderBottomText}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding ManufacturingFactory}" Style="{StaticResource CellTopTextLeft}"/>
+                                <TextBlock Text="{Binding ProcessingFactory}" Style="{StaticResource CellBottomTextLeft}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- JP:営業担当者 / 進捗状況 | VI:Nhân viên kinh doanh / Tình trạng tiến độ | EN:Sales representative / progress status -->
+                <DataGridTemplateColumn Width="95">
+                    <DataGridTemplateColumn.Header>
+                        <StackPanel>
+                            <TextBlock Text="営業担当者" Style="{StaticResource HeaderTopText}"/>
+                            <TextBlock Text="進捗状況" Style="{StaticResource HeaderBottomText}"/>
+                        </StackPanel>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding SalesRep}" Style="{StaticResource CellTopTextLeft}"/>
+                                <TextBlock Text="{Binding ProgressStatus}" Style="{StaticResource CellBottomTextLeft}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!--
+        JP: 下部の操作ボタン列 - 画像では左寄せ／中央寄せ／右寄せの3グループに分かれて配置されている
+        VI: Hàng nút thao tác phía dưới - trong ảnh gốc được chia làm 3 nhóm: trái / giữa / phải
+        EN: Bottom action button row - the screenshot spreads these across 3 groups: left / middle / right
+        -->
+        <Grid Grid.Row="2" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- JP:左グループ | VI:Nhóm bên trái | EN:Left group -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <!-- JP:一覧印刷 | VI:In danh sách | EN:Print list -->
+                <Button Content="一覧印刷" Command="{Binding PrintListCommand}" Width="80" Height="28"/>
+                <!-- JP:オーダー票 | VI:Xuất phiếu đặt hàng | EN:Order slip -->
+                <Button Content="オーダー票" Command="{Binding OrderSlipCommand}" Width="80" Height="28" Margin="5,0,0,0"/>
+                <!-- JP:CSV出力 | VI:Xuất CSV | EN:CSV export -->
+                <Button Content="CSV" Command="{Binding CsvCommand}" Width="80" Height="28" Margin="5,0,0,0"/>
+                <!-- JP:品種計 | VI:Thống kê theo chủng loại | EN:Item-type totals -->
+                <Button Content="品種計" Command="{Binding ItemCountCommand}" Width="80" Height="28" Margin="5,0,0,0"/>
+            </StackPanel>
+
+            <!-- JP:右グループ | VI:Nhóm bên phải | EN:Right group -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- JP:コピー受注(明細有) | VI:Sao chép đơn hàng (có chi tiết) | EN:Copy order (with detail) -->
+                <Button Content="コピー受注(明細有)" Command="{Binding CopyOrderWithDetailCommand}" Width="130" Height="28"/>
+                <!-- JP:コピー受注(明細無) | VI:Sao chép đơn hàng (không chi tiết) | EN:Copy order (without detail) -->
+                <Button Content="コピー受注(明細無)" Command="{Binding CopyOrderWithoutDetailCommand}" Width="130" Height="28" Margin="5,0,0,0"/>
+                <!-- JP:照会 | VI:Tra cứu | EN:Inquiry -->
+                <Button Content="照会" Command="{Binding InquiryCommand}" Width="80" Height="28" Margin="5,0,0,0"/>
+                <!-- JP:修正 | VI:Sửa | EN:Modify -->
+                <Button Content="修正" Command="{Binding ModifyCommand}" Width="80" Height="28" Margin="5,0,0,0"/>
+                <!-- JP:削除 | VI:Xóa | EN:Delete -->
+                <Button Content="削除" Command="{Binding DeleteCommand}" Width="80" Height="28" Margin="5,0,0,0"/>
+                <!-- JP:戻る | VI:Quay lại | EN:Back -->
+                <Button Content="戻る" Command="{Binding BackCommand}" Width="80" Height="28" Margin="5,0,0,0"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

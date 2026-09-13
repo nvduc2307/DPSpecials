@@ -1,9 +1,9 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
-using DPSpecial.Tools.ECP.ECPSchedule.ECPShapes.action;
+using DPSpecial.Tools.ECP.ECPShapes.action;
 using DPSpecial.Utils;
 
-namespace DPSpecial.Tools.ECP.ECPSchedule.ECPShapes
+namespace DPSpecial.Tools.ECP.ECPShapes
 {
     [Transaction(TransactionMode.Manual)]
     public class ECPShapeCmd : IExternalCommand
