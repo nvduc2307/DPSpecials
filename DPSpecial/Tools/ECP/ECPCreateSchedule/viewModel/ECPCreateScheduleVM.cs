@@ -5,41 +5,11 @@ namespace DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.viewModel
 {
     public partial class ECPCreateScheduleVM : ObservableObject
     {
-        // JP: 物件名称 (検索欄)
-        // VI: Tên công trình (ô tìm kiếm)
-        // EN: Property/site name (search field)
+        // JP: 検索欄（ヘッダー部）のデータ
+        // VI: Dữ liệu phần header / ô tìm kiếm
+        // EN: Search header data
         [ObservableProperty]
-        private string _propertyName;
-
-        // JP: 物件詳細 (検索欄)
-        // VI: Chi tiết công trình (ô tìm kiếm)
-        // EN: Property/site detail (search field)
-        [ObservableProperty]
-        private string _propertyDetail;
-
-        // JP: 販売店名称 (検索欄・1行目)
-        // VI: Tên đại lý bán hàng (ô tìm kiếm, dòng 1)
-        // EN: Dealer name (search field, line 1)
-        [ObservableProperty]
-        private string _dealerName;
-
-        // JP: 販売店名称の2行目（部署名）
-        // VI: Dòng 2 của tên đại lý (tên bộ phận/phòng ban)
-        // EN: Second line of dealer name (division/department name)
-        [ObservableProperty]
-        private string _dealerDivision;
-
-        // JP: 担当支店
-        // VI: Chi nhánh phụ trách
-        // EN: Branch office in charge
-        [ObservableProperty]
-        private string _branchOffice;
-
-        // JP: オーダー票 種類 (右上のコンボボックス、例: "1:オーダー票")
-        // VI: Loại phiếu đặt hàng (combobox góc trên phải, vd "1:オーダー票")
-        // EN: Order slip type (top-right combobox, e.g. "1:オーダー票")
-        [ObservableProperty]
-        private string _orderSlipType;
+        private ECPOrderScheduleHeaderModel _header = new();
 
         // JP: 検索結果一覧（グリッドの行データ）
         // VI: Danh sách kết quả tìm kiếm (dữ liệu từng dòng trong lưới)

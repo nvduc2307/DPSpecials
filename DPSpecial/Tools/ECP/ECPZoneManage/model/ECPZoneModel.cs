@@ -4,6 +4,12 @@ namespace DPSpecial.Tools.ECP.ECPZoneManage.model
     {
         public int Id { get; set; }
 
+        [ObservableProperty]
+        private string _orderNo = string.Empty;
+
+        [ObservableProperty]
+        private string _propertyRegNo = string.Empty;
+
         private string _name = string.Empty;
         public string Name
         {
@@ -27,6 +33,8 @@ namespace DPSpecial.Tools.ECP.ECPZoneManage.model
     public class ECPZoneSaveModel
     {
         public int Id { get; set; }
+        public string OrderNo { get; set; } = string.Empty;
+        public string PropertyRegNo { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
     }

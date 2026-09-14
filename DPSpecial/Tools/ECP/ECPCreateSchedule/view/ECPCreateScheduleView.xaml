@@ -1,4 +1,4 @@
-﻿<Window x:Class="DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.view.ECPCreateScheduleView"
+<Window x:Class="DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.view.ECPCreateScheduleView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -52,6 +52,32 @@
             <Setter Property="Foreground" Value="Red"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
+        <!-- JP:編集可能セル用TextBoxスタイル（上段・太字）| VI:Style TextBox cho cell chỉnh sửa được (dòng trên, đậm) | EN:Editable cell TextBox style (top line, bold) -->
+        <Style x:Key="CellTopTextBox" TargetType="TextBox">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="1,1,1,0"/>
+            <Setter Property="Padding" Value="1,0,3,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <!-- JP:編集可能セル用TextBoxスタイル（下段）| VI:Style TextBox cho cell chỉnh sửa được (dòng dưới) | EN:Editable cell TextBox style (bottom line) -->
+        <Style x:Key="CellBottomTextBox" TargetType="TextBox">
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="1,0,1,1"/>
+            <Setter Property="Padding" Value="1,0,3,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style x:Key="CellTopTextBoxLeft" TargetType="TextBox" BasedOn="{StaticResource CellTopTextBox}">
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
+        <Style x:Key="CellBottomTextBoxLeft" TargetType="TextBox" BasedOn="{StaticResource CellBottomTextBox}">
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
     </Window.Resources>
     <Grid Margin="8">
         <Grid.RowDefinitions>
@@ -72,46 +98,50 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="230"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="Auto"/>    <!-- label 物件名称/物件詳細 -->
+                    <ColumnDefinition Width="*"/>       <!-- textbox cột 1 -->
+                    <ColumnDefinition Width="Auto"/>    <!-- label 販売店名称 -->
+                    <ColumnDefinition Width="200"/>     <!-- textbox cột 2 -->
+                    <ColumnDefinition Width="Auto"/>    <!-- label 担当支店 -->
+                    <ColumnDefinition Width="200"/>     <!-- textbox cột 3 -->
+                    <ColumnDefinition Width="Auto"/>    <!-- cột 4: combo + buttons -->
                 </Grid.ColumnDefinitions>
 
+                <!-- ═══ Cột 1: 物件名称 / 物件詳細 (2 label + 2 textbox) ═══ -->
                 <!-- JP:物件名称 | VI:Tên công trình | EN:Property name -->
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="物件名称" VerticalAlignment="Center" Margin="0,0,6,6"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding PropertyName, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,10,6" VerticalContentAlignment="Center"/>
-
-                <!-- JP:販売店名称 | VI:Tên đại lý bán hàng | EN:Dealer name -->
-                <TextBlock Grid.Row="0" Grid.Column="2" Text="販売店名称" VerticalAlignment="Center" Margin="0,0,6,6"/>
-                <StackPanel Grid.Row="0" Grid.Column="3" Margin="0,0,10,6">
-                    <TextBox Text="{Binding DealerName, UpdateSourceTrigger=PropertyChanged}" Height="25" VerticalContentAlignment="Center"/>
-                    <!-- JP:販売店名称の2行目（部署名） | VI:Dòng 2 - tên bộ phận | EN:Line 2 - division name -->
-                    <TextBlock Text="{Binding DealerDivision}" FontSize="10" Foreground="#555555" Margin="2,2,0,0"/>
-                </StackPanel>
-
-                <!-- JP:担当支店 | VI:Chi nhánh phụ trách | EN:Branch office in charge -->
-                <TextBlock Grid.Row="0" Grid.Column="4" Text="担当支店" VerticalAlignment="Center" Margin="0,0,6,6"/>
-                <ComboBox Grid.Row="0" Grid.Column="5" ItemsSource="{Binding BranchOffices}" SelectedItem="{Binding BranchOffice, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,10,6" VerticalAlignment="Top"/>
-
-                <!-- JP:オーダー票 種類（例: "1:オーダー票"） | VI:Loại phiếu đặt hàng | EN:Order slip type -->
-                <ComboBox Grid.Row="0" Grid.Column="7" ItemsSource="{Binding OrderSlipTypes}" SelectedItem="{Binding OrderSlipType, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,0,6" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Header.PropertyName, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,10,6" VerticalContentAlignment="Center"/>
 
                 <!-- JP:物件詳細 | VI:Chi tiết công trình | EN:Property detail -->
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="物件詳細" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding PropertyDetail, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,10,0" VerticalContentAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Header.PropertyDetail, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,10,0" VerticalContentAlignment="Center"/>
 
-                <StackPanel Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- ═══ Cột 2: 販売店名称 (1 label + 2 textbox) ═══ -->
+                <!-- JP:販売店名称(1行目) | VI:Tên đại lý (dòng 1) | EN:Dealer name (line 1) -->
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="販売店名称" VerticalAlignment="Center" Margin="0,0,6,6"/>
+                <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding Header.DealerName, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,10,6" VerticalContentAlignment="Center"/>
+
+                <!-- JP:販売店名称(2行目/部署名) | VI:Tên đại lý (dòng 2/bộ phận) | EN:Dealer name (line 2/division) -->
+                <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding Header.DealerDivision, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,10,0" VerticalContentAlignment="Center" FontSize="11"/>
+
+                <!-- ═══ Cột 3: 担当支店 (1 label + 2 textbox) ═══ -->
+                <!-- JP:担当支店(1行目) | VI:Chi nhánh phụ trách (dòng 1) | EN:Branch office (line 1) -->
+                <TextBlock Grid.Row="0" Grid.Column="4" Text="担当支店" VerticalAlignment="Center" Margin="0,0,6,6"/>
+                <TextBox Grid.Row="0" Grid.Column="5" Text="{Binding Header.BranchOffice, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,10,6" VerticalContentAlignment="Center"/>
+
+                <!-- JP:担当支店(2行目) | VI:Chi nhánh phụ trách (dòng 2) | EN:Branch office (line 2) -->
+                <TextBox Grid.Row="1" Grid.Column="5" Text="{Binding Header.BranchOfficeDetail, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,10,0" VerticalContentAlignment="Center" FontSize="11"/>
+
+                <!-- ═══ Cột 4: オーダー票 ComboBox + buttons ═══ -->
+                <!-- JP:オーダー票 種類 | VI:Loại phiếu đặt hàng | EN:Order slip type -->
+                <ComboBox Grid.Row="0" Grid.Column="6" ItemsSource="{Binding OrderSlipTypes}" SelectedItem="{Binding Header.OrderSlipType, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="0,0,0,6" VerticalAlignment="Top" MinWidth="130"/>
+
+                <StackPanel Grid.Row="1" Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Stretch">
                     <!-- JP:検索 | VI:Tìm kiếm | EN:Search -->
-                    <Button Content="検索" Command="{Binding SearchCommand}" Width="70" Height="25"/>
                     <!-- JP:全チェックON | VI:Chọn tất cả | EN:Check all on -->
-                    <Button Content="全チェックON" Command="{Binding CheckAllOnCommand}" Width="90" Height="25" Margin="10,0,0,0"/>
+                    <Button Content="全チェックON" Command="{Binding CheckAllOnCommand}" HorizontalAlignment="Left" Height="25" Padding="4,0"/>
                     <!-- JP:全チェックOFF | VI:Bỏ chọn tất cả | EN:Check all off -->
-                    <Button Content="全チェックOFF" Command="{Binding CheckAllOffCommand}" Width="90" Height="25" Margin="5,0,0,0"/>
+                    <Button Content="全チェックOFF" Command="{Binding CheckAllOffCommand}" Height="25" Padding="4,0" Margin="4,0,0,0"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -159,9 +189,33 @@
                         <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                             <Setter Property="Background" Value="{StaticResource NormalRowBrush}"/>
                         </Trigger>
+                        <!-- JP:選択行の背景色を薄くする | VI:Làm nhạt màu nền dòng được chọn | EN:Lighten selected row background -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#CCE8FF"/>
+                        </Trigger>
+                        <!-- JP:マウスオーバー行の背景色 | VI:Màu nền khi di chuột qua dòng | EN:Mouse-over row background -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#E0F0FF"/>
+                        </Trigger>
                     </Style.Triggers>
                 </Style>
             </DataGrid.RowStyle>
+            <!--
+            JP: セル選択時のデフォルト青色を上書きして、行レベルの薄い背景色を有効にする
+            VI: Ghi đè màu xanh đậm mặc định khi chọn cell, để màu nền nhạt ở row có hiệu lực
+            EN: Override the default dark-blue cell highlight so the light row-level background takes effect
+            -->
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Foreground" Value="Black"/>
+                            <Setter Property="BorderBrush" Value="Transparent"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
             <DataGrid.Columns>
                 <!--
                 JP:オーダー票印刷（印刷対象を選ぶチェック） - チェックボックスを行の縦中央に配置
@@ -270,7 +324,10 @@
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding DealerName}" Style="{StaticResource CellTopTextLeft}" VerticalAlignment="Center"/>
+                            <StackPanel>
+                                <TextBox Text="{Binding DealerName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellTopTextBoxLeft}"/>
+                                <TextBox Text="{Binding DealerDivision, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellBottomTextBoxLeft}"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -340,8 +397,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding DesiredDeliveryDate}" Style="{StaticResource CellTopText}"/>
-                                <TextBlock Text="{Binding SiteArrivalDate}" Style="{StaticResource CellBottomText}"/>
+                                <TextBox Text="{Binding DesiredDeliveryDate, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellTopTextBox}"/>
+                                <TextBox Text="{Binding SiteArrivalDate, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellBottomTextBox}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -358,8 +415,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding ProcessShipScheduledDate}" Style="{StaticResource CellTopText}"/>
-                                <TextBlock Text="{Binding ProcessArrivalScheduledDate}" Style="{StaticResource CellBottomText}"/>
+                                <TextBox Text="{Binding ProcessShipScheduledDate, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellTopTextBox}"/>
+                                <TextBox Text="{Binding ProcessArrivalScheduledDate, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellBottomTextBox}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -380,7 +437,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding FactoryShipScheduledDate}" Style="{StaticResource CellTopText}"/>
+                                <TextBox Text="{Binding FactoryShipScheduledDate, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellTopTextBox}"/>
                                 <TextBlock Text="{Binding ChangeNotAllowed}" Style="{StaticResource CellBottomTextRed}"/>
                             </StackPanel>
                         </DataTemplate>
@@ -398,8 +455,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding ProcessShipActualDate}" Style="{StaticResource CellTopText}"/>
-                                <TextBlock Text="{Binding FactoryShipActualDate}" Style="{StaticResource CellBottomText}"/>
+                                <TextBox Text="{Binding ProcessShipActualDate, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellTopTextBox}"/>
+                                <TextBox Text="{Binding FactoryShipActualDate, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellBottomTextBox}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -416,8 +473,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding FinalShipDate}" Style="{StaticResource CellTopText}"/>
-                                <TextBlock Text="{Binding TemporaryStorage}" Style="{StaticResource CellBottomText}"/>
+                                <TextBox Text="{Binding FinalShipDate, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellTopTextBox}"/>
+                                <TextBox Text="{Binding TemporaryStorage, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellBottomTextBox}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -434,8 +491,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding DeliveryChangeCount}" Style="{StaticResource CellTopText}"/>
-                                <TextBlock Text="{Binding InternalDeform}" Style="{StaticResource CellBottomText}"/>
+                                <TextBox Text="{Binding DeliveryChangeCount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellTopTextBox}"/>
+                                <TextBox Text="{Binding InternalDeform, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellBottomTextBox}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -452,8 +509,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding ManufacturingFactory}" Style="{StaticResource CellTopTextLeft}"/>
-                                <TextBlock Text="{Binding ProcessingFactory}" Style="{StaticResource CellBottomTextLeft}"/>
+                                <TextBox Text="{Binding ManufacturingFactory, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellTopTextBoxLeft}"/>
+                                <TextBox Text="{Binding ProcessingFactory, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellBottomTextBoxLeft}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -470,8 +527,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding SalesRep}" Style="{StaticResource CellTopTextLeft}"/>
-                                <TextBlock Text="{Binding ProgressStatus}" Style="{StaticResource CellBottomTextLeft}"/>
+                                <TextBox Text="{Binding SalesRep, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellTopTextBoxLeft}"/>
+                                <TextBox Text="{Binding ProgressStatus, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellBottomTextBoxLeft}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

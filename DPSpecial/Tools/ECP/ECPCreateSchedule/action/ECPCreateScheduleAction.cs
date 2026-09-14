@@ -2,7 +2,12 @@ using System.ComponentModel;
 using DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.model;
 using DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.view;
 using DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.viewModel;
+using DPSpecial.Tools.ECP.ECPZoneInstall.schema;
+using DPSpecial.Tools.ECP.ECPZoneManage.model;
+using DPSpecial.Tools.ECP.ECPZoneManage.schema;
 using DPSpecial.Utils;
+using Newtonsoft.Json;
+using WallParam = DPSpecial.MVVM.Models.WallParameterName;
 
 namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
 {
@@ -11,11 +16,18 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
     // EN: Class that wires up sample data, commands, and shows the window
     public partial class ECPCreateScheduleAction
     {
+        // JP: ECP基材の単位面積あたりの重量 (kg/m²)
+        // VI: Khối lượng riêng của vật liệu nền ECP (kg/m²)
+        // EN: Weight per unit area of ECP base material (kg/m²)
+        private const double WEIGHT_PER_M2 = 15.4;
+
+        private readonly Document _document;
         private ECPCreateScheduleVM _viewModel;
         private ECPCreateScheduleView _view;
 
-        public ECPCreateScheduleAction()
+        public ECPCreateScheduleAction(Document document)
         {
+            _document = document;
             _viewModel = new ECPCreateScheduleVM
             {
                 // JP: 担当支店の選択肢（サンプル）
@@ -50,13 +62,15 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
             // JP: 検索欄の初期値（サンプル）
             // VI: Giá trị mặc định cho ô tìm kiếm (dữ liệu mẫu)
             // EN: Default values for the search fields (sample data)
-            _viewModel.PropertyName = "株式会社コパルコンパスティクス 加古川地区新事務所建設工事"; // JP:物件名称 VI:Tên công trình EN:Property name
-            _viewModel.DealerName = "住友林業株式会社"; // JP:販売店名称(1行目) VI:Tên đại lý (dòng 1) EN:Dealer name (line 1)
-            _viewModel.DealerDivision = "木材建材事業本部大阪営業部 ツリューションクループ"; // JP:販売店名称(2行目/部署名) VI:Tên đại lý (dòng 2/bộ phận) EN:Dealer name (line 2/division)
-            _viewModel.BranchOffice = _viewModel.BranchOffices.FirstOrDefault();
-            _viewModel.OrderSlipType = _viewModel.OrderSlipTypes.FirstOrDefault();
+            _viewModel.Header.PropertyName = "株式会社コパルコンパスティクス 加古川地区新事務所建設工事"; // JP:物件名称 VI:Tên công trình EN:Property name
+            _viewModel.Header.PropertyDetail = "1F○工区-コーナー"; // JP:物件詳細 VI:Chi tiết công trình EN:Property detail
+            _viewModel.Header.DealerName = "住友林業株式会社"; // JP:販売店名称(1行目) VI:Tên đại lý (dòng 1) EN:Dealer name (line 1)
+            _viewModel.Header.DealerDivision = "木材建材事業本部大阪営業部 ツリューションクループ"; // JP:販売店名称(2行目/部署名) VI:Tên đại lý (dòng 2/bộ phận) EN:Dealer name (line 2/division)
+            _viewModel.Header.BranchOffice = "大阪支店"; // JP:担当支店(1行目) VI:Chi nhánh (dòng 1) EN:Branch office (line 1)
+            _viewModel.Header.BranchOfficeDetail = "大阪支店"; // JP:担当支店(2行目) VI:Chi nhánh (dòng 2) EN:Branch office (line 2)
+            _viewModel.Header.OrderSlipType = _viewModel.OrderSlipTypes.FirstOrDefault();
 
-            foreach (var order in GetSampleOrders())
+            foreach (var order in GetOrders())
             {
                 // JP: 各行のチェック変化を監視してヘッダーの3状態チェックボックスに反映する
                 // VI: Theo dõi thay đổi checkbox từng dòng để đồng bộ vào checkbox 3 trạng thái ở header
@@ -64,6 +78,11 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
                 order.PropertyChanged += Order_PropertyChanged;
                 _viewModel.Orders.Add(order);
             }
+
+            // JP: Header.PropertyName が変わったら全行の PropertyName を同期する
+            // VI: Khi Header.PropertyName thay đổi, đồng bộ xuống PropertyName của tất cả các dòng
+            // EN: When Header.PropertyName changes, sync it to all order rows' PropertyName
+            _viewModel.Header.PropertyChanged += Header_PropertyChanged;
 
             _view = new ECPCreateScheduleView { DataContext = _viewModel };
         }
@@ -73,86 +92,163 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
             _view.ShowDialog();
         }
 
-        // JP: グリッドに表示するサンプル行データを作成する
-        // VI: Tạo dữ liệu mẫu cho các dòng hiển thị trong lưới
-        // EN: Build sample rows to display in the grid
-        private List<ECPOrderScheduleModel> GetSampleOrders()
+        // JP: ヘッダーの共有フィールドが変わったら、全行を同じ値に同期する
+        // VI: Khi các trường chung ở header thay đổi → đồng bộ xuống tất cả dòng trong Orders
+        // EN: When shared header fields change → sync to all order rows
+        private void Header_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            const string propertyName = "株式会社コパルコンパスティクス 加古川地区新事務所建設工事"; // JP:物件名称 VI:Tên công trình EN:Property name
-            const string dealerName = "住友林業株式会社"; // JP:販売店名称 VI:Tên đại lý EN:Dealer name
-            const string desiredDeliveryDate = "2026/09/24"; // JP:希望納期 VI:Ngày giao hàng mong muốn EN:Desired delivery date
-            const string siteArrivalDate = "2026/10/05"; // JP:現場到着予定日 VI:Ngày dự kiến hàng đến công trường EN:Scheduled site arrival date
-
-            // JP: 工場出荷予定日 - 列「工場出荷予定日 / 変更期日(赤)」の1行目データ。2行目は変更不可（赤字）
-            // VI: Ngày dự kiến xuất xưởng - dữ liệu dòng 1 của cột "工場出荷予定日 / 変更期日(đỏ)". Dòng 2 là 変更不可 (đỏ)
-            // EN: Scheduled factory shipment date - line-1 data for the "工場出荷予定日 / 変更期日(red)" column. Line 2 is 変更不可 (red)
-            const string factoryShipScheduledDate = "2026/10/02";
-
-            const string manufacturingFactory = "市川工場"; // JP:製造工場 VI:Nhà máy sản xuất EN:Manufacturing factory
-            const string salesRep = "田川 雅浩"; // JP:営業担当者 VI:Nhân viên kinh doanh phụ trách EN:Sales representative
-            const string progressStatus = "納期回答済"; // JP:進捗状況 VI:Tình trạng tiến độ (đã phản hồi ngày giao) EN:Progress status (delivery date confirmed)
-
-            // JP:受注No, 物件詳細, 基材m², 基材重量, 働きm², 働き重量, 役物m², 実枚, 内変形
-            // VI:Số đơn hàng, Chi tiết công trình, Diện tích/Khối lượng vật liệu nền, Diện tích/Khối lượng thi công, Diện tích phụ kiện, Số tấm thực tế, Số biến dạng nội bộ
-            // EN:Order No, Property detail, Base area/weight, Working area/weight, Accessory area, Actual sheets, Internal deform count
-            (string orderNo, string propertyDetail, string baseArea, string baseWeight, string workArea, string workWeight, string accessoryArea, string sheets, string internalDeform)[] rows =
+            switch (e.PropertyName)
             {
-                ("1262702924", "1F①工区-コーナー", "2.462", "151", "2.462", "151", "4.245", "1", ""),
-                ("1262702925", "1F②工区-フラット", "27.398", "1,737", "27.250", "1,728", "", "13", ""),
-                ("1262702926", "1F③工区-ワイド", "5.076", "336", "5.076", "336", "", "2", ""),
-                ("1262702927", "1F④工区-コーナー", "2.462", "151", "2.462", "151", "4.245", "1", ""),
-                ("1262702928", "1F⑤工区-フラット", "50.340", "3,194", "50.340", "3,194", "", "41", ""),
-                ("1262702929", "1F⑥工区-フラット", "54.873", "3,485", "54.873", "3,485", "", "43", ""),
-                ("1262702930", "1F⑦工区-コーナー", "6.974", "426", "6.256", "383", "12.025", "4", "2"),
-                ("1262702931", "1F⑧工区-フラット", "44.258", "2,811", "39.958", "2,537", "", "28", "1"),
-                ("1262702932", "1F⑨工区-コーナー", "2.462", "151", "2.462", "151", "4.245", "1", ""),
-                ("1262702933", "1F⑩工区-フラット", "45.843", "2,906", "45.406", "2,878", "", "29", "1"),
-                ("1262702934", "1F⑪工区-ワイド", "27.099", "1,801", "27.099", "1,801", "", "9", ""),
-                ("1262702935", "1F⑫工区-フラット", "20.417", "1,299", "15.022", "955", "", "18", ""),
-            };
+                case nameof(ECPOrderScheduleHeaderModel.PropertyName):
+                    foreach (var order in _viewModel.Orders)
+                        order.PropertyName = _viewModel.Header.PropertyName;
+                    break;
+                case nameof(ECPOrderScheduleHeaderModel.DealerName):
+                    foreach (var order in _viewModel.Orders)
+                        order.DealerName = _viewModel.Header.DealerName;
+                    break;
+                case nameof(ECPOrderScheduleHeaderModel.DealerDivision):
+                    foreach (var order in _viewModel.Orders)
+                        order.DealerDivision = _viewModel.Header.DealerDivision;
+                    break;
+            }
+        }
 
+        // JP: ゾーン定義を読み取り、各ゾーンに属するECP要素から面積・重量を集計して1行のオーダーデータを作成する
+        //     基材m² = WidthMax(固定寸法) × Height(高さ)  ← 元板寸法（カット前）
+        //     働きm² = Width(幅) × Height(高さ)           ← 実際の施工寸法（カット後）
+        //     重量   = 面積 × WEIGHT_PER_M2
+        // VI: Đọc zone, thu thập các phần tử ECP thuộc mỗi zone, tính tổng diện tích & khối lượng
+        //     基材m² = WidthMax(固定寸法) × Height(高さ)  ← kích thước nguyên tấm (trước cắt)
+        //     働きm² = Width(幅) × Height(高さ)           ← kích thước thi công thực tế (sau cắt)
+        //     Khối lượng = Diện tích × WEIGHT_PER_M2
+        // EN: Read zones, collect ECP elements per zone, sum area & weight
+        //     BaseArea = WidthMax × Height  ← full panel dimension (before cutting)
+        //     WorkArea = Width × Height     ← actual working dimension (after cutting)
+        //     Weight   = Area × WEIGHT_PER_M2
+        private List<ECPOrderScheduleModel> GetOrders()
+        {
             var result = new List<ECPOrderScheduleModel>();
-            foreach (var row in rows)
+
+            // JP: ゾーン定義を読み取る | VI: Đọc danh sách zone | EN: Read zone definitions
+            var zoneSchema = new ECPZoneSchema(ECPZoneSchema.GUID, ECPZoneSchema.NAME);
+            var content = zoneSchema.Read(_document.ProjectInformation);
+            if (string.IsNullOrEmpty(content)) return result;
+
+            var zones = JsonConvert.DeserializeObject<List<ECPZoneSaveModel>>(content) ?? new List<ECPZoneSaveModel>();
+            if (!zones.Any()) return result;
+
+            // JP: 全ECP要素を取得し、ゾーンIDでグループ化する
+            // VI: Lấy tất cả phần tử ECP, nhóm theo Zone ID
+            // EN: Collect all ECP elements and group by assigned zone Id
+            var elementsByZone = GetECPElementsByZone();
+
+            foreach (var zone in zones)
             {
+                double totalBaseAreaM2 = 0;
+                double totalWorkAreaM2 = 0;
+                int sheetCount = 0;
+
+                if (elementsByZone.TryGetValue(zone.Id, out var elements))
+                {
+                    foreach (var elem in elements)
+                    {
+                        var (baseArea, workArea) = GetElementArea(elem);
+                        totalBaseAreaM2 += baseArea;
+                        totalWorkAreaM2 += workArea;
+                        sheetCount++;
+                    }
+                }
+                if (totalBaseAreaM2 == 0) continue;
+                if (totalWorkAreaM2 == 0) continue;
+
+                var baseWeight = totalBaseAreaM2 * WEIGHT_PER_M2;
+                var workWeight = totalWorkAreaM2 * WEIGHT_PER_M2;
+
                 result.Add(new ECPOrderScheduleModel
                 {
-                    OrderNo = row.orderNo,
-                    PropertyRegNo = "B260000604",
-                    PropertyName = propertyName,
-                    PropertyDetail = row.propertyDetail,
-                    DealerName = dealerName,
-                    // JP: グリッド上は部署名を表示しない想定（検索欄にのみ表示）
-                    // VI: Không hiển thị tên bộ phận trong lưới (chỉ hiển thị ở ô tìm kiếm)
-                    // EN: Division name is not shown in the grid (search field only)
-                    DealerDivision = string.Empty,
-                    BaseAreaM2 = row.baseArea,
-                    BaseWeight = row.baseWeight,
-                    WorkAreaM2 = row.workArea,
-                    WorkWeight = row.workWeight,
-                    AccessoryAreaM2 = row.accessoryArea,
-                    ActualSheets = row.sheets,
-                    DesiredDeliveryDate = desiredDeliveryDate,
-                    SiteArrivalDate = siteArrivalDate,
-                    // JP: サンプルではこの2列は未加工のため空欄（ユーザー提供の画像に合わせる）
-                    // VI: Trong dữ liệu mẫu, 2 cột này để trống vì đơn chưa gia công (khớp ảnh người dùng cung cấp)
-                    // EN: Left blank in sample data since these orders are not yet processed (matches the user-provided screenshot)
-                    ProcessShipScheduledDate = "",
-                    ProcessArrivalScheduledDate = "",
-                    FactoryShipScheduledDate = factoryShipScheduledDate,
-                    ChangeNotAllowed = "変更不可", // JP:変更不可 VI:Không thể thay đổi EN:Cannot be changed
-                    ProcessShipActualDate = "",
-                    FactoryShipActualDate = "",
-                    FinalShipDate = "",
-                    TemporaryStorage = "",
-                    DeliveryChangeCount = "",
-                    InternalDeform = row.internalDeform,
-                    ManufacturingFactory = manufacturingFactory,
-                    ProcessingFactory = "",
-                    SalesRep = salesRep,
-                    ProgressStatus = progressStatus,
+                    PropertyName = _viewModel.Header.PropertyName,
+                    DealerName = _viewModel.Header.DealerName,
+                    DealerDivision = _viewModel.Header.DealerDivision,
+                    OrderNo = zone.OrderNo,
+                    PropertyRegNo = zone.PropertyRegNo,
+                    PropertyDetail = zone.Name,
+                    BaseAreaM2 = totalBaseAreaM2 > 0 ? totalBaseAreaM2.ToString("F3") : "",
+                    BaseWeight = baseWeight > 0 ? Math.Round(baseWeight, 0).ToString("N0") : "",
+                    WorkAreaM2 = totalWorkAreaM2 > 0 ? totalWorkAreaM2.ToString("F3") : "",
+                    WorkWeight = workWeight > 0 ? Math.Round(workWeight, 0).ToString("N0") : "",
+                    ActualSheets = sheetCount > 0 ? sheetCount.ToString() : "",
+                    DesiredDeliveryDate = DateTime.Today.ToString("yyyy/MM/dd"),
+                    SiteArrivalDate = DateTime.Today.ToString("yyyy/MM/dd"),
+                    FactoryShipScheduledDate = DateTime.Today.ToString("yyyy/MM/dd"),
+                    ChangeNotAllowed = "変更不可",
                 });
             }
             return result;
+        }
+
+        // JP: ドキュメント内の全ECP FamilyInstanceを取得し、各要素に割り当てられたゾーンIDでグループ化する
+        // VI: Lấy tất cả FamilyInstance ECP trong document, nhóm theo Zone ID đã gán cho từng phần tử
+        // EN: Collect all ECP FamilyInstances in the document and group them by their assigned zone Id
+        private Dictionary<int, List<FamilyInstance>> GetECPElementsByZone()
+        {
+            var result = new Dictionary<int, List<FamilyInstance>>();
+            var assignSchema = new ECPZoneAssignSchema(ECPZoneAssignSchema.GUID, ECPZoneAssignSchema.NAME);
+
+            var ecpElements = new FilteredElementCollector(_document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(FamilyInstance))
+                .Cast<FamilyInstance>()
+                .Where(x => x.Symbol.FamilyName.ToUpper().Contains("ECP"));
+
+            foreach (var elem in ecpElements)
+            {
+                var json = assignSchema.Read(elem);
+                if (string.IsNullOrEmpty(json)) continue;
+
+                var assignedZone = JsonConvert.DeserializeObject<ECPZoneSaveModel>(json);
+                if (assignedZone == null) continue;
+
+                if (!result.ContainsKey(assignedZone.Id))
+                    result[assignedZone.Id] = new List<FamilyInstance>();
+                result[assignedZone.Id].Add(elem);
+            }
+            return result;
+        }
+
+        // JP: 1つのECP要素から基材面積と働き面積を計算する (単位: m²)
+        //     基材面積 = WidthMax(固定寸法) × Height  ← カット前の元板サイズ
+        //     働き面積 = Width(幅) × Height            ← カット後の実際の施工サイズ
+        //     Revit内部の寸法は feet → ToMillimeters() で mm に変換後、m² に換算
+        // VI: Tính diện tích vật liệu nền và diện tích thi công từ 1 phần tử ECP (đơn vị: m²)
+        //     Diện tích nền = WidthMax(固定寸法) × Height  ← kích thước tấm gốc trước cắt
+        //     Diện tích thi công = Width(幅) × Height      ← kích thước thực tế sau cắt
+        //     Kích thước trong Revit là feet → ToMillimeters() chuyển sang mm, rồi quy đổi ra m²
+        // EN: Compute base area and working area for one ECP element (unit: m²)
+        //     BaseArea = WidthMax × Height  ← original panel size before cutting
+        //     WorkArea = Width × Height     ← actual installed size after cutting
+        //     Revit internal units are feet → ToMillimeters() converts to mm, then to m²
+        private (double baseAreaM2, double workAreaM2) GetElementArea(FamilyInstance element)
+        {
+            // JP: WidthMax(固定寸法) = Type parameter, Width(幅) = Instance parameter
+            // VI: WidthMax(固定寸法) = tham số Type, Width(幅) = tham số Instance
+            // EN: WidthMax(固定寸法) = Type parameter, Width(幅) = Instance parameter
+            var widthMaxParam = element.Symbol.LookupParameter(WallParam.WidthMax);
+            var widthParam = element.LookupParameter(WallParam.Width);
+            var heightParam = element.LookupParameter(WallParam.Length);
+
+            if (widthMaxParam == null || widthParam == null || heightParam == null)
+                return (0, 0);
+
+            var widthMaxMm = widthMaxParam.AsDouble().ToMillimeters();
+            var widthMm = widthParam.AsDouble().ToMillimeters();
+            var heightMm = heightParam.AsDouble().ToMillimeters();
+
+            // mm² → m²  (÷ 1,000,000)
+            var baseAreaM2 = (widthMaxMm * heightMm) / 1_000_000.0;
+            var workAreaM2 = (widthMm * heightMm) / 1_000_000.0;
+
+            return (Math.Round(baseAreaM2, 3), Math.Round(workAreaM2, 3));
         }
 
         private void _SearchCommand() { }

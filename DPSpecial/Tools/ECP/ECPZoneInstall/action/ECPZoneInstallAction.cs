@@ -1,5 +1,7 @@
 using Autodesk.Revit.UI;
+using DPSpecial.Contains;
 using DPSpecial.Tools.ECP.ECPZoneInstall.schema;
+using DPSpecial.Tools.ECP.ECPZoneUpdate.action;
 using DPSpecial.Tools.ECP.ECPZoneInstall.view;
 using DPSpecial.Tools.ECP.ECPZoneInstall.viewModel;
 using DPSpecial.Tools.ECP.ECPZoneManage.model;
@@ -22,6 +24,17 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
         {
             _uidocument = uidocument;
             _document = _uidocument.Document;
+
+            var activeView = _document.ActiveView;
+            if (activeView is not ViewSection vs || vs.ViewType != ViewType.Elevation)
+                throw new Exception("Please switch to an elevation view before running this command.");
+            if (!activeView.Name.Contains("_settingZone"))
+                throw new Exception($"The elevation view name must contain \"_settingZone\".\nCurrent view: \"{activeView.Name}\"");
+
+            var zoneUpdateCheck = new ECPZoneUpdateAction(uidocument);
+            if (zoneUpdateCheck.HasZoneChanged())
+                throw new Exception("Zone definitions have been changed.\nPlease run \"Update Zone\" before installing zones.");
+
             var zoneSchema = new ECPZoneSchema(ECPZoneSchema.GUID, ECPZoneSchema.NAME);
             _assignSchema = new ECPZoneAssignSchema(ECPZoneAssignSchema.GUID, ECPZoneAssignSchema.NAME);
 
@@ -76,15 +89,20 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
                 {
                     try
                     {
-                        var element = _uidocument.Selection.PickElement(
+                        var elements = _uidocument.Selection.PickElements(
                             _document,
                             null,
                             _ECPSelectFilter,
                             $"Pick ECP element for zone \"{zone.Name}\" (Esc to stop)...");
-                        if (element == null) continue;
-
-                        _assignSchema.Write(element, JsonConvert.SerializeObject(zone));
-                        TintElement(view, element, color);
+                        if (elements == null) continue;
+                        if (!elements.Any()) continue;
+                        foreach (var element in elements)
+                        {
+                            _assignSchema.Write(element, JsonConvert.SerializeObject(zone));
+                            TintElement(view, element, color);
+                            WriteParamterElement(element, zone.Name);
+                        }
+                        _document.Regenerate();
                     }
                     catch (Exception)
                     {
@@ -106,6 +124,17 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
         {
             if (element is not FamilyInstance fa) return false;
             return fa.Symbol.FamilyName.ToUpper().Contains("ECP");
+        }
+
+        private void WriteParamterElement(Element element, string zone)
+        {
+            try
+            {
+                element.LookupParameter(WallParameterName.ZONE).Set(zone);
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
         // Tints the element in the active view so the assigned zone is visible at a glance.

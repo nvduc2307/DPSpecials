@@ -16,16 +16,17 @@ namespace DPSpecial.Tools.ECP.ECPZoneManage.action
         private readonly ECPZoneSchema _schema;
         private readonly ECPZoneManageVM _viewModel;
         private readonly ECPZoneManageView _view;
+        private List<ECPZoneModel> _originZones;
 
         public ECPZoneManageAction(UIDocument uidocument)
         {
             _uidocument = uidocument;
             _document = _uidocument.Document;
             _schema = new ECPZoneSchema(ECPZoneSchema.GUID, ECPZoneSchema.NAME);
-
+            _originZones = GetZones();
             _viewModel = new ECPZoneManageVM
             {
-                Zones = GetZones(),
+                Zones = new ObservableCollection<ECPZoneModel>([.. _originZones]),
                 PickColorCommand = new RelayCommand<ECPZoneModel>(_PickColor),
                 CreateZoneCommand = new RelayCommand(_CreateZone),
                 DeleteZoneCommand = new RelayCommand(_DeleteZone),
@@ -46,15 +47,15 @@ namespace DPSpecial.Tools.ECP.ECPZoneManage.action
 
         // Zones are persisted as JSON on ProjectInformation via Extensible Storage (DPSpecial.Cores.SchemaEntityBase),
         // the same pattern ECPShapeAction uses for per-element data.
-        private ObservableCollection<ECPZoneModel> GetZones()
+        private List<ECPZoneModel> GetZones()
         {
-            var result = new ObservableCollection<ECPZoneModel>();
+            var result = new List<ECPZoneModel>();
             var content = _schema.Read(_document.ProjectInformation);
             if (string.IsNullOrEmpty(content)) return result;
 
             var saved = JsonConvert.DeserializeObject<List<ECPZoneSaveModel>>(content) ?? new List<ECPZoneSaveModel>();
             foreach (var item in saved)
-                result.Add(new ECPZoneModel { Id = item.Id, Name = item.Name, Color = item.Color });
+                result.Add(new ECPZoneModel { Id = item.Id, OrderNo = item.OrderNo, PropertyRegNo = item.PropertyRegNo, Name = item.Name, Color = item.Color });
             return result;
         }
 
@@ -107,13 +108,50 @@ namespace DPSpecial.Tools.ECP.ECPZoneManage.action
 
         private void _Ok()
         {
+            // --- Validation: empty fields ---
+            var errors = new List<string>();
+
+            var emptyNumber = _viewModel.Zones.Any(z => string.IsNullOrWhiteSpace(z.OrderNo));
+            var emptyCode = _viewModel.Zones.Any(z => string.IsNullOrWhiteSpace(z.PropertyRegNo));
+            var emptyName = _viewModel.Zones.Any(z => string.IsNullOrWhiteSpace(z.Name));
+
+            if (emptyNumber) errors.Add("- OrderNo không được để trống.");
+            if (emptyCode) errors.Add("- PropertyRegNo không được để trống.");
+            if (emptyName) errors.Add("- Name không được để trống.");
+
+            // --- Validation: duplicate fields ---
+            var dupNumbers = _viewModel.Zones
+                .Where(z => !string.IsNullOrWhiteSpace(z.OrderNo))
+                .GroupBy(z => z.OrderNo.Trim())
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key);
+
+            var dupCodes = _viewModel.Zones
+                .Where(z => !string.IsNullOrWhiteSpace(z.PropertyRegNo))
+                .GroupBy(z => z.PropertyRegNo.Trim())
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key);
+
+            var dupNames = _viewModel.Zones
+                .Where(z => !string.IsNullOrWhiteSpace(z.Name))
+                .GroupBy(z => z.Name.Trim())
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key);
+
+            if (dupNumbers.Any()) errors.Add($"- OrderNo bị trùng: {string.Join(", ", dupNumbers)}");
+            if (dupCodes.Any()) errors.Add($"- PropertyRegNo bị trùng: {string.Join(", ", dupCodes)}");
+            if (dupNames.Any()) errors.Add($"- Name bị trùng: {string.Join(", ", dupNames)}");
+
+            if (errors.Any())
+            {
+                IO.ShowWarning(string.Join("\n", errors));
+                return;
+            }
+
             _view.Close();
 
-            // Keep only one entry per name (oldest Id wins) in case duplicate-name validation was ever bypassed.
             var zoneSaves = _viewModel.Zones
-                .GroupBy(x => x.Name)
-                .Select(g => g.OrderBy(x => x.Id).First())
-                .Select(x => new ECPZoneSaveModel { Id = x.Id, Name = x.Name, Color = x.Color })
+                .Select(x => new ECPZoneSaveModel { Id = x.Id, OrderNo = x.OrderNo, PropertyRegNo = x.PropertyRegNo, Name = x.Name, Color = x.Color })
                 .ToList();
             var content = JsonConvert.SerializeObject(zoneSaves);
 
@@ -124,7 +162,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneManage.action
                 ts.Commit();
             }
         }
-
         private void _Cancel()
         {
             _view.Close();
