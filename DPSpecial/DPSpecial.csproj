@@ -63,7 +63,7 @@
     <!-- https://github.com/Nice3point/Revit.Build.Tasks -->
     <PropertyGroup>
         <IsRepackable>false</IsRepackable>
-        <DeployRevitAddin>false</DeployRevitAddin>
+        <DeployRevitAddin>true</DeployRevitAddin>
     </PropertyGroup>
     <ItemGroup>
       <None Remove="Resources\Families\ECP\０１．フラットMNH-A-140930\ECP_MNH-10060A%28オス側カット%29.rfa" />

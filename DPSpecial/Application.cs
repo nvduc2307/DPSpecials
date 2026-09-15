@@ -55,11 +55,7 @@ namespace DPSpecial
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
 
-            panel.AddPushButton<ECPCreateScheduleCmd>("create")
-                .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
-                .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
-
-            panel.AddPushButton<ECPZoneManageCmd>("zone")
+            panel.AddPushButton<ECPZoneManageCmd>("manage\nzone")
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
 
@@ -70,6 +66,11 @@ namespace DPSpecial
             panel.AddPushButton<ECPZoneUpdateCmd>("update\nzone")
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
+
+            panel.AddPushButton<ECPCreateScheduleCmd>("create\nschedule")
+                .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
+                .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
+
         }
     }
 }

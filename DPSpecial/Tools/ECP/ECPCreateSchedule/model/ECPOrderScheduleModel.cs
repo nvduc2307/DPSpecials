@@ -24,7 +24,8 @@ namespace DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.model
         // JP: 物件名称
         // VI: Tên công trình
         // EN: Property/site name
-        public string PropertyName { get; set; } = string.Empty;
+        [ObservableProperty]
+        private string _propertyName = string.Empty;
 
         // JP: 物件詳細
         // VI: Chi tiết công trình
@@ -34,12 +35,14 @@ namespace DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.model
         // JP: 販売店名称
         // VI: Tên đại lý bán hàng
         // EN: Dealer name
-        public string DealerName { get; set; } = string.Empty;
+        [ObservableProperty]
+        private string _dealerName = string.Empty;
 
         // JP: 販売店名称の2行目（部署名）- 検索欄のみで使用、グリッドには非表示の想定
         // VI: Dòng 2 của tên đại lý (bộ phận) - chỉ dùng ở ô tìm kiếm, không hiển thị trong lưới
         // EN: Second line of dealer name (division) - used in the search field only, not shown in the grid
-        public string DealerDivision { get; set; } = string.Empty;
+        [ObservableProperty]
+        private string _dealerDivision = string.Empty;
 
         // JP: 基材m²
         // VI: Diện tích vật liệu nền (m²)

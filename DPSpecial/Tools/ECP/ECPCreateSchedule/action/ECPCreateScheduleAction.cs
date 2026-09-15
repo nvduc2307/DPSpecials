@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using DPSpecial.Tools.ECP.ECPCreateSchedule.schema;
 using DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.model;
 using DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.view;
 using DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.viewModel;
@@ -22,12 +23,15 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
         private const double WEIGHT_PER_M2 = 15.4;
 
         private readonly Document _document;
+        private readonly ECPOrderScheduleSchema _orderScheduleSchema;
         private ECPCreateScheduleVM _viewModel;
         private ECPCreateScheduleView _view;
 
         public ECPCreateScheduleAction(Document document)
         {
             _document = document;
+            _orderScheduleSchema = new ECPOrderScheduleSchema(ECPOrderScheduleSchema.GUID, ECPOrderScheduleSchema.NAME);
+
             _viewModel = new ECPCreateScheduleVM
             {
                 // JP: 担当支店の選択肢（サンプル）
@@ -59,25 +63,10 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
                 IsAllCheckedAction = _IsAllCheckedAction,
             };
 
-            // JP: 検索欄の初期値（サンプル）
-            // VI: Giá trị mặc định cho ô tìm kiếm (dữ liệu mẫu)
-            // EN: Default values for the search fields (sample data)
-            _viewModel.Header.PropertyName = "株式会社コパルコンパスティクス 加古川地区新事務所建設工事"; // JP:物件名称 VI:Tên công trình EN:Property name
-            _viewModel.Header.PropertyDetail = "1F○工区-コーナー"; // JP:物件詳細 VI:Chi tiết công trình EN:Property detail
-            _viewModel.Header.DealerName = "住友林業株式会社"; // JP:販売店名称(1行目) VI:Tên đại lý (dòng 1) EN:Dealer name (line 1)
-            _viewModel.Header.DealerDivision = "木材建材事業本部大阪営業部 ツリューションクループ"; // JP:販売店名称(2行目/部署名) VI:Tên đại lý (dòng 2/bộ phận) EN:Dealer name (line 2/division)
-            _viewModel.Header.BranchOffice = "大阪支店"; // JP:担当支店(1行目) VI:Chi nhánh (dòng 1) EN:Branch office (line 1)
-            _viewModel.Header.BranchOfficeDetail = "大阪支店"; // JP:担当支店(2行目) VI:Chi nhánh (dòng 2) EN:Branch office (line 2)
-            _viewModel.Header.OrderSlipType = _viewModel.OrderSlipTypes.FirstOrDefault();
-
-            foreach (var order in GetOrders())
-            {
-                // JP: 各行のチェック変化を監視してヘッダーの3状態チェックボックスに反映する
-                // VI: Theo dõi thay đổi checkbox từng dòng để đồng bộ vào checkbox 3 trạng thái ở header
-                // EN: Watch each row's checkbox change to keep the 3-state header checkbox in sync
-                order.PropertyChanged += Order_PropertyChanged;
-                _viewModel.Orders.Add(order);
-            }
+            // JP: 保存済みデータを読み込み、ゾーンとECP要素を組み合わせてオーダー一覧を生成する
+            // VI: Đọc dữ liệu đã lưu, kết hợp zone + ECP elements để tạo danh sách order
+            // EN: Load saved data, combine with zones + ECP elements to build order list
+            LoadAndMergeOrders();
 
             // JP: Header.PropertyName が変わったら全行の PropertyName を同期する
             // VI: Khi Header.PropertyName thay đổi, đồng bộ xuống PropertyName của tất cả các dòng
@@ -91,6 +80,177 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
         {
             _view.ShowDialog();
         }
+
+        #region Load / Merge / Save
+
+        // JP: 保存済みデータをProjectInformationから読み込み、現在のゾーン定義とECP要素の実測値を
+        //     組み合わせて、オーダー一覧を生成する。保存データが無い場合はゾーン/要素から新規作成する。
+        // VI: Đọc dữ liệu đã lưu từ ProjectInformation, kết hợp với zone definitions và ECP elements
+        //     thực tế để tạo danh sách order. Nếu chưa có dữ liệu lưu thì tạo mới từ zone/elements.
+        // EN: Read saved data from ProjectInformation, merge with current zone definitions and actual
+        //     ECP elements to build the order list. If no saved data exists, create fresh from zones/elements.
+        private void LoadAndMergeOrders()
+        {
+            // JP: 保存済みデータを読み込む | VI: Đọc dữ liệu đã lưu | EN: Load saved data
+            var savedData = LoadSavedData();
+
+            // JP: ヘッダーを復元する（保存データがあればそれを使う、なければデフォルト値を設定）
+            // VI: Khôi phục header (dùng dữ liệu đã lưu nếu có, không thì dùng giá trị mặc định)
+            // EN: Restore header (use saved data if available, otherwise set defaults)
+            if (savedData != null)
+            {
+                _viewModel.Header.PropertyName = savedData.Header.PropertyName;
+                _viewModel.Header.PropertyDetail = savedData.Header.PropertyDetail;
+                _viewModel.Header.DealerName = savedData.Header.DealerName;
+                _viewModel.Header.DealerDivision = savedData.Header.DealerDivision;
+                _viewModel.Header.BranchOffice = savedData.Header.BranchOffice;
+                _viewModel.Header.BranchOfficeDetail = savedData.Header.BranchOfficeDetail;
+                _viewModel.Header.OrderSlipType = savedData.Header.OrderSlipType;
+            }
+            else
+            {
+                // JP: 初回起動時のデフォルト値
+                // VI: Giá trị mặc định lần chạy đầu tiên
+                // EN: Default values for first run
+                _viewModel.Header.PropertyName = string.Empty;
+                _viewModel.Header.PropertyDetail = string.Empty;
+                _viewModel.Header.DealerName = string.Empty;
+                _viewModel.Header.DealerDivision = string.Empty;
+                _viewModel.Header.BranchOffice = string.Empty;
+                _viewModel.Header.BranchOfficeDetail = string.Empty;
+                _viewModel.Header.OrderSlipType = _viewModel.OrderSlipTypes.FirstOrDefault();
+            }
+
+            // JP: ゾーン定義とECP要素から最新のオーダーデータを計算する
+            // VI: Tính toán dữ liệu order mới nhất từ zone definitions và ECP elements
+            // EN: Compute fresh order data from zone definitions and ECP elements
+            var freshOrders = GetOrders();
+
+            // JP: 保存済みの手入力データ（日付・ステータス等）を最新の計算結果にマージする
+            // VI: Merge dữ liệu đã nhập thủ công (ngày, trạng thái, v.v.) vào kết quả tính mới nhất
+            // EN: Merge saved manual-entry data (dates, status, etc.) into the freshly computed results
+            var savedOrdersByOrderNo = savedData?.Orders?
+                .Where(o => !string.IsNullOrEmpty(o.OrderNo))
+                .ToDictionary(o => o.OrderNo, o => o)
+                ?? new Dictionary<string, ECPOrderScheduleOrderSaveModel>();
+
+            foreach (var order in freshOrders)
+            {
+                if (savedOrdersByOrderNo.TryGetValue(order.OrderNo, out var saved))
+                {
+                    // JP: 面積・重量・枚数は実測値（最新）を使い、手入力項目は保存値を復元する
+                    // VI: Diện tích/khối lượng/số tấm dùng giá trị tính mới, các mục nhập tay thì khôi phục từ dữ liệu đã lưu
+                    // EN: Use freshly computed area/weight/sheets, restore manually entered fields from saved data
+                    order.IsChecked = saved.IsChecked;
+                    order.DesiredDeliveryDate = saved.DesiredDeliveryDate;
+                    order.SiteArrivalDate = saved.SiteArrivalDate;
+                    order.ProcessShipScheduledDate = saved.ProcessShipScheduledDate;
+                    order.ProcessArrivalScheduledDate = saved.ProcessArrivalScheduledDate;
+                    order.FactoryShipScheduledDate = saved.FactoryShipScheduledDate;
+                    order.ChangeNotAllowed = saved.ChangeNotAllowed;
+                    order.ProcessShipActualDate = saved.ProcessShipActualDate;
+                    order.FactoryShipActualDate = saved.FactoryShipActualDate;
+                    order.FinalShipDate = saved.FinalShipDate;
+                    order.TemporaryStorage = saved.TemporaryStorage;
+                    order.DeliveryChangeCount = saved.DeliveryChangeCount;
+                    order.InternalDeform = saved.InternalDeform;
+                    order.ManufacturingFactory = saved.ManufacturingFactory;
+                    order.ProcessingFactory = saved.ProcessingFactory;
+                    order.SalesRep = saved.SalesRep;
+                    order.ProgressStatus = saved.ProgressStatus;
+                }
+
+                // JP: 各行のチェック変化を監視してヘッダーの3状態チェックボックスに反映する
+                // VI: Theo dõi thay đổi checkbox từng dòng để đồng bộ vào checkbox 3 trạng thái ở header
+                // EN: Watch each row's checkbox change to keep the 3-state header checkbox in sync
+                order.PropertyChanged += Order_PropertyChanged;
+                _viewModel.Orders.Add(order);
+            }
+
+            // JP: 読み込み後、全行のチェック状態からヘッダーの3状態チェックボックスを同期する
+            // VI: Sau khi load xong, đồng bộ checkbox 3 trạng thái ở header dựa trên trạng thái các dòng
+            // EN: After loading, sync the header's 3-state checkbox from the rows' checked states
+            if (_viewModel.Orders.Any())
+            {
+                var checkedCount = _viewModel.Orders.Count(o => o.IsChecked);
+                if (checkedCount == 0) _viewModel.SetIsAllCheckedFromRows(false);
+                else if (checkedCount == _viewModel.Orders.Count) _viewModel.SetIsAllCheckedFromRows(true);
+                else _viewModel.SetIsAllCheckedFromRows(null);
+            }
+        }
+
+        // JP: ProjectInformation から保存済みデータを読み込む
+        // VI: Đọc dữ liệu đã lưu từ ProjectInformation
+        // EN: Read saved data from ProjectInformation
+        private ECPOrderScheduleSaveModel LoadSavedData()
+        {
+            var content = _orderScheduleSchema.Read(_document.ProjectInformation);
+            if (string.IsNullOrEmpty(content)) return null;
+            return JsonConvert.DeserializeObject<ECPOrderScheduleSaveModel>(content);
+        }
+
+        // JP: 現在のヘッダーとオーダー一覧を ProjectInformation に保存する
+        // VI: Lưu header và danh sách order hiện tại vào ProjectInformation
+        // EN: Save current header and order list to ProjectInformation
+        private void SaveData()
+        {
+            var saveModel = new ECPOrderScheduleSaveModel
+            {
+                Header = new ECPOrderScheduleHeaderSaveModel
+                {
+                    PropertyName = _viewModel.Header.PropertyName,
+                    PropertyDetail = _viewModel.Header.PropertyDetail,
+                    DealerName = _viewModel.Header.DealerName,
+                    DealerDivision = _viewModel.Header.DealerDivision,
+                    BranchOffice = _viewModel.Header.BranchOffice,
+                    BranchOfficeDetail = _viewModel.Header.BranchOfficeDetail,
+                    OrderSlipType = _viewModel.Header.OrderSlipType,
+                },
+                Orders = _viewModel.Orders.Select(o => new ECPOrderScheduleOrderSaveModel
+                {
+                    IsChecked = o.IsChecked,
+                    OrderNo = o.OrderNo,
+                    PropertyRegNo = o.PropertyRegNo,
+                    PropertyName = o.PropertyName,
+                    PropertyDetail = o.PropertyDetail,
+                    DealerName = o.DealerName,
+                    DealerDivision = o.DealerDivision,
+                    BaseAreaM2 = o.BaseAreaM2,
+                    BaseWeight = o.BaseWeight,
+                    WorkAreaM2 = o.WorkAreaM2,
+                    WorkWeight = o.WorkWeight,
+                    AccessoryAreaM2 = o.AccessoryAreaM2,
+                    ActualSheets = o.ActualSheets,
+                    DesiredDeliveryDate = o.DesiredDeliveryDate,
+                    SiteArrivalDate = o.SiteArrivalDate,
+                    ProcessShipScheduledDate = o.ProcessShipScheduledDate,
+                    ProcessArrivalScheduledDate = o.ProcessArrivalScheduledDate,
+                    FactoryShipScheduledDate = o.FactoryShipScheduledDate,
+                    ChangeNotAllowed = o.ChangeNotAllowed,
+                    ProcessShipActualDate = o.ProcessShipActualDate,
+                    FactoryShipActualDate = o.FactoryShipActualDate,
+                    FinalShipDate = o.FinalShipDate,
+                    TemporaryStorage = o.TemporaryStorage,
+                    DeliveryChangeCount = o.DeliveryChangeCount,
+                    InternalDeform = o.InternalDeform,
+                    ManufacturingFactory = o.ManufacturingFactory,
+                    ProcessingFactory = o.ProcessingFactory,
+                    SalesRep = o.SalesRep,
+                    ProgressStatus = o.ProgressStatus,
+                }).ToList(),
+            };
+
+            var content = JsonConvert.SerializeObject(saveModel);
+
+            using (var ts = new Transaction(_document, "Save ECP Order Schedule"))
+            {
+                ts.Start();
+                _orderScheduleSchema.Write(_document.ProjectInformation, content);
+                ts.Commit();
+            }
+        }
+
+        #endregion
 
         // JP: ヘッダーの共有フィールドが変わったら、全行を同じ値に同期する
         // VI: Khi các trường chung ở header thay đổi → đồng bộ xuống tất cả dòng trong Orders
@@ -308,8 +468,12 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
         private void _ModifyCommand() => IO.ShowInfo("修正は未実装です"); // VI: Chưa triển khai Sửa / EN: Modify not implemented
         private void _DeleteCommand() => IO.ShowInfo("削除は未実装です"); // VI: Chưa triển khai Xóa / EN: Delete not implemented
 
+        // JP: 戻るボタン — データを保存してから画面を閉じる
+        // VI: Nút Back — lưu dữ liệu rồi đóng màn hình
+        // EN: Back button — save data then close the window
         private void _BackCommand()
         {
+            SaveData();
             _view.Close();
         }
     }

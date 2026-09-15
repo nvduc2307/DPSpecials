@@ -307,7 +307,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding PropertyName}" Style="{StaticResource CellTopTextLeft}"/>
+                                <TextBlock Text="{Binding PropertyName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CellTopTextLeft}"/>
                                 <TextBlock Text="{Binding PropertyDetail}" Style="{StaticResource CellBottomTextLeft}"/>
                             </StackPanel>
                         </DataTemplate>
