@@ -80,6 +80,7 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
             _view.Hide();
             var color = ParseColor(zone.Color);
             var view = _document.ActiveView;
+            var patternId = GetDiagonalCrosshatchPatternId();
 
             using (var ts = new Transaction(_document, "Install ECP Zone"))
             {
@@ -99,7 +100,7 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
                         foreach (var element in elements)
                         {
                             _assignSchema.Write(element, JsonConvert.SerializeObject(zone));
-                            TintElement(view, element, color);
+                            TintElement(view, element, color, patternId);
                             WriteParamterElement(element, zone.Name);
                         }
                         _document.Regenerate();
@@ -138,13 +139,30 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
         }
 
         // Tints the element in the active view so the assigned zone is visible at a glance.
-        private void TintElement(Autodesk.Revit.DB.View view, Element element, Color color)
+        private void TintElement(Autodesk.Revit.DB.View view, Element element, Color color, ElementId patternId)
         {
             var overrides = new OverrideGraphicSettings();
+            if (patternId != ElementId.InvalidElementId)
+            {
+                overrides.SetSurfaceForegroundPatternId(patternId);
+                overrides.SetSurfaceForegroundPatternVisible(true);
+            }
             overrides.SetSurfaceForegroundPatternColor(color);
             overrides.SetProjectionLineColor(color);
             overrides.SetSurfaceTransparency(30);
             view.SetElementOverrides(element.Id, overrides);
+        }
+
+        // "Diagonal crosshatch" fill pattern used for the surface foreground override.
+        private ElementId GetDiagonalCrosshatchPatternId()
+        {
+            var patterns = new FilteredElementCollector(_document)
+                .OfClass(typeof(FillPatternElement))
+                .Cast<FillPatternElement>()
+                .ToList();
+            var pattern = patterns.FirstOrDefault(x => string.Equals(x.Name, "Diagonal crosshatch", StringComparison.OrdinalIgnoreCase))
+                ?? patterns.FirstOrDefault(x => x.Name.IndexOf("Diagonal crosshatch", StringComparison.OrdinalIgnoreCase) >= 0);
+            return pattern?.Id ?? ElementId.InvalidElementId;
         }
 
         private Color ParseColor(string hex)
