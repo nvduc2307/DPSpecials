@@ -1,24 +1,24 @@
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
-using DPSpecial.Tools.ECP.ManageZoneViewsSetting.action;
+using DPSpecial.Tools.ECP.ECPZoneDimensionUpdateAll.action;
 using DPSpecial.Utils;
 
-namespace DPSpecial.Tools.ECP.ManageZoneViewsSetting
+namespace DPSpecial.Tools.ECP.ECPZoneDimensionUpdateAll
 {
     [Transaction(TransactionMode.Manual)]
-    public class ManageZoneViewsSettingCmd : IExternalCommand
+    public class ECPZoneDimensionUpdateAllCmd : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             var result = Result.Succeeded;
             var uiDocument = commandData.Application.ActiveUIDocument;
             var document = uiDocument.Document;
-            using (var tsg = new TransactionGroup(document, "ManageZoneViewsSettingCmd"))
+            using (var tsg = new TransactionGroup(document, "ECPZoneDimensionUpdateAllCmd"))
             {
                 tsg.Start();
                 try
                 {
-                    var action = new ManageZoneViewsSettingAction(uiDocument);
+                    var action = new ECPZoneDimensionUpdateAllAction(uiDocument);
                     action.Execute();
                     tsg.Assimilate();
                 }

@@ -1,5 +1,6 @@
 using Autodesk.Revit.UI;
 using DPSpecial.Contains;
+using DPSpecial.Tools.ECP.ECPZoneInstall.action;
 using DPSpecial.Tools.ECP.ECPZoneInstall.schema;
 using DPSpecial.Tools.ECP.ECPZoneManage.model;
 using DPSpecial.Tools.ECP.ECPZoneManage.schema;
@@ -48,6 +49,9 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
             var updatedCount = 0;
             var removedCount = 0;
             var view = _document.ActiveView;
+            // Overrides are only (re)applied in the zone-setting view, using the same pattern as Install Zone.
+            var isSettingView = view.Name.Contains(ECPZoneDimensionHelper.NameViewSettingZone);
+            var patternId = isSettingView ? GetDiagonalCrosshatchPatternId() : ElementId.InvalidElementId;
 
             using (var ts = new Transaction(_document, "Update ECP Zones"))
             {
@@ -68,7 +72,8 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
                     {
                         // Zone was deleted from the zone list — remove assignment from element.
                         _assignSchema.Write(element, string.Empty);
-                        ClearElementOverrides(view, element);
+                        if (isSettingView)
+                            ClearElementOverrides(view, element);
                         WriteParameterElement(element, string.Empty);
                         removedCount++;
                         continue;
@@ -88,8 +93,8 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
                     _assignSchema.Write(element, updatedJson);
 
                     // Refresh the color overlay to match the (possibly new) zone color.
-                    var color = ParseColor(currentZone.Color);
-                    TintElement(view, element, color);
+                    if (isSettingView)
+                        TintElement(view, element, ParseColor(currentZone.Color), patternId);
                     WriteParameterElement(element, currentZone.Name);
                     updatedCount++;
                 }
@@ -122,13 +127,30 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
             return JsonConvert.DeserializeObject<List<ECPZoneSaveModel>>(content) ?? new List<ECPZoneSaveModel>();
         }
 
-        private void TintElement(Autodesk.Revit.DB.View view, Element element, Color color)
+        private void TintElement(Autodesk.Revit.DB.View view, Element element, Color color, ElementId patternId)
         {
             var overrides = new OverrideGraphicSettings();
+            if (patternId != ElementId.InvalidElementId)
+            {
+                overrides.SetSurfaceForegroundPatternId(patternId);
+                overrides.SetSurfaceForegroundPatternVisible(true);
+            }
             overrides.SetSurfaceForegroundPatternColor(color);
             overrides.SetProjectionLineColor(color);
             overrides.SetSurfaceTransparency(30);
             view.SetElementOverrides(element.Id, overrides);
+        }
+
+        // "Diagonal crosshatch" fill pattern used for the surface foreground override.
+        private ElementId GetDiagonalCrosshatchPatternId()
+        {
+            var patterns = new FilteredElementCollector(_document)
+                .OfClass(typeof(FillPatternElement))
+                .Cast<FillPatternElement>()
+                .ToList();
+            var pattern = patterns.FirstOrDefault(x => string.Equals(x.Name, "Diagonal crosshatch", StringComparison.OrdinalIgnoreCase))
+                ?? patterns.FirstOrDefault(x => x.Name.IndexOf("Diagonal crosshatch", StringComparison.OrdinalIgnoreCase) >= 0);
+            return pattern?.Id ?? ElementId.InvalidElementId;
         }
 
         private void ClearElementOverrides(Autodesk.Revit.DB.View view, Element element)

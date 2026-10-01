@@ -12,14 +12,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace DPSpecial.Tools.ECP.ManageZoneViews.view
+namespace DPSpecial.Tools.ECP.ECPZoneManageViewsSetting.view
 {
     /// <summary>
     /// Interaction logic for ManageZoneViewView.xaml
     /// </summary>
-    public partial class ManageZoneViewView : Window
+    public partial class ECPZoneManageViewsSettingView : Window
     {
-        public ManageZoneViewView()
+        public ECPZoneManageViewsSettingView()
         {
             InitializeComponent();
         }

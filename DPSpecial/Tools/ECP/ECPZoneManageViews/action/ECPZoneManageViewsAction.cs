@@ -1,31 +1,31 @@
 using Autodesk.Revit.UI;
-using DPSpecial.Tools.ECP.ManageZoneViewsSetting.view;
-using DPSpecial.Tools.ECP.ManageZoneViewsSetting.viewModel;
+using DPSpecial.Tools.ECP.ECPZoneManageViews.view;
+using DPSpecial.Tools.ECP.ECPZoneManageViews.viewModel;
 using DPSpecial.Utils;
 using View = Autodesk.Revit.DB.View;
 
-namespace DPSpecial.Tools.ECP.ManageZoneViewsSetting.action
+namespace DPSpecial.Tools.ECP.ECPZoneManageViews.action
 {
-    public class ManageZoneViewsSettingAction
+    public class ECPZoneManageViewsAction
     {
-        public static string _nameViewSettingZone = "_settingZone";
+        private const string NameViewSettingZone = "_settingZone";
         private readonly UIDocument _uidocument;
         private readonly Document _document;
-        private readonly ManageZoneViewsSettingVM _viewModel;
-        private readonly ManageZoneViewsSettingView _view;
+        private readonly ECPZoneManageViewsVM _viewModel;
+        private readonly ECPZoneManageViewsView _view;
 
-        public ManageZoneViewsSettingAction(UIDocument uidocument)
+        public ECPZoneManageViewsAction(UIDocument uidocument)
         {
             _uidocument = uidocument;
             _document = _uidocument.Document;
 
-            _viewModel = new ManageZoneViewsSettingVM
+            _viewModel = new ECPZoneManageViewsVM
             {
-                Views = GetViewElevationsSettingZone(),
+                Views = GetViewElevations(),
                 ShowViewCommand = new RelayCommand(_ShowView),
                 BackCommand = new RelayCommand(_Back),
             };
-            _view = new ManageZoneViewsSettingView { DataContext = _viewModel };
+            _view = new ECPZoneManageViewsView { DataContext = _viewModel };
         }
 
         public void Execute()
@@ -49,9 +49,9 @@ namespace DPSpecial.Tools.ECP.ManageZoneViewsSetting.action
         public void ShowView(List<View> views, View view)
         {
             View viewTarget = null;
-            if (!view.Name.Contains(_nameViewSettingZone))
+            if (!view.Name.Contains(NameViewSettingZone))
             {
-                var nameView = $"{view.Name}{_nameViewSettingZone}";
+                var nameView = $"{view.Name}{NameViewSettingZone}";
                 viewTarget = views.FirstOrDefault(x => x.Name == nameView);
                 if (viewTarget == null)
                 {
@@ -76,7 +76,7 @@ namespace DPSpecial.Tools.ECP.ManageZoneViewsSetting.action
             _uidocument.ActiveView = viewTarget;
         }
 
-        public List<View> GetViewElevationsSettingZone()
+        public List<View> GetViewElevations()
         {
             var views = new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
@@ -84,7 +84,7 @@ namespace DPSpecial.Tools.ECP.ManageZoneViewsSetting.action
                 .Cast<View>()
                 .Where(x => !x.IsTemplate)
                 .Where(x => x.ViewType == ViewType.Elevation)
-                .Where(x => x.Name.Contains(_nameViewSettingZone))
+                .Where(x => !x.Name.Contains(NameViewSettingZone))
                 .OrderBy(x => x.Name)
                 .ToList();
             return views;

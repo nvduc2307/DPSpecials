@@ -1,8 +1,8 @@
 using View = Autodesk.Revit.DB.View;
 
-namespace DPSpecial.Tools.ECP.ManageZoneViews.viewModel
+namespace DPSpecial.Tools.ECP.ECPZoneManageViews.viewModel
 {
-    public partial class ManageZoneViewVM : ObservableObject
+    public partial class ECPZoneManageViewsVM : ObservableObject
     {
         public List<View> Views { get; set; } = new();
 

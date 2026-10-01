@@ -4,10 +4,12 @@ using DPSpecial.Tools.ECP.ECPCreateSchedule;
 using DPSpecial.Tools.ECP.ECPFamilyImport;
 using DPSpecial.Tools.ECP.ECPModifyWidth;
 using DPSpecial.Tools.ECP.ECPShapes;
+using DPSpecial.Tools.ECP.ECPZoneDimensionUpdate;
+using DPSpecial.Tools.ECP.ECPZoneDimensionUpdateAll;
 using DPSpecial.Tools.ECP.ECPZoneInstall;
 using DPSpecial.Tools.ECP.ECPZoneManage;
-using DPSpecial.Tools.ECP.ManageZoneViews;
-using DPSpecial.Tools.ECP.ManageZoneViewsSetting;
+using DPSpecial.Tools.ECP.ECPZoneManageViews;
+using DPSpecial.Tools.ECP.ECPZoneManageViewsSetting;
 using DPSpecial.Tools.ECP.ECPZoneUpdate;
 using Nice3point.Revit.Extensions.UI;
 using Nice3point.Revit.Toolkit.External;
@@ -54,11 +56,11 @@ namespace DPSpecial
         {
             var panel = Application.CreatePanel("ECP Zone", "DPSpecial");
 
-            panel.AddPushButton<ManageZoneViewCmd>("zone\nviews")
+            panel.AddPushButton<ECPZoneManageViewsCmd>("zone\nviews")
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
 
-            panel.AddPushButton<ManageZoneViewsSettingCmd>("zone views\nsetting")
+            panel.AddPushButton<ECPZoneManageViewsSettingCmd>("zone views\nsetting")
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
 
@@ -67,6 +69,14 @@ namespace DPSpecial
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
 
             panel.AddPushButton<ECPZoneInstallCmd>("install\nzone")
+                .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
+                .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
+
+            panel.AddPushButton<ECPZoneDimensionUpdateCmd>("update\ndimension")
+                .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
+                .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
+
+            panel.AddPushButton<ECPZoneDimensionUpdateAllCmd>("update all\ndimension")
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
 
