@@ -1,0 +1,30 @@
+namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
+{
+    // One row of the detail grid.
+    public class ECPOrderDetailRowModel
+    {
+        public string No { get; set; } = string.Empty;
+        // 施工図No
+        public string WorkNo { get; set; } = string.Empty;
+        // 商品名 / 製品番号
+        public string ProductName { get; set; } = string.Empty;
+        public string PartNumber { get; set; } = string.Empty;
+        // 長さ[mm]
+        public string Length { get; set; } = string.Empty;
+        // 数量[枚] (blue code printed after the quantity)
+        public string Quantity { get; set; } = string.Empty;
+        public string QuantityCode { get; set; } = string.Empty;
+        // 縦切図: Normal / FlatCut / RightBlock
+        public string ShapeKind { get; set; } = "Normal";
+        // 縦切図 end profile, derived from the type name: a type ending in "T" (凸) has a tongue on both ends,
+        // every other type has a tongue on the left end and a groove on the right end.
+        public string Profile => (PartNumber ?? string.Empty).Trim().EndsWith("T", StringComparison.OrdinalIgnoreCase)
+            ? "DoubleTongue"
+            : "TongueGroove";
+
+        // 寸法[mm]
+        public string Dimension { get; set; } = string.Empty;
+        // Every other row is tinted cyan.
+        public bool IsAlternate { get; set; }
+    }
+}

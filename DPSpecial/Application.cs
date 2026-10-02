@@ -1,6 +1,7 @@
 using DPSpecial.Tools.DPWallParameter;
 using DPSpecial.Tools.ECP.ECPCreate;
 using DPSpecial.Tools.ECP.ECPCreateSchedule;
+using DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail;
 using DPSpecial.Tools.ECP.ECPFamilyImport;
 using DPSpecial.Tools.ECP.ECPModifyWidth;
 using DPSpecial.Tools.ECP.ECPShapes;
@@ -95,6 +96,10 @@ namespace DPSpecial
             panel.AddPushButton<ECPCreateScheduleCmd>("create\nschedule")
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
+
+            //panel.AddPushButton<ECPCreateScheduleOrderDetailCmd>("order\ndetail")
+            //    .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
+            //    .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
 
             
         }

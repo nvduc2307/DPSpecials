@@ -470,6 +470,7 @@
     
     <ItemGroup>
       <Folder Include="Tools\ALC\" />
+      <Folder Include="Tools\ECP\ECPCreateScheduleOrderDetail\imgs\" />
       <Folder Include="Tools\ECP\ECPCreateScheduleOrderDetail\view\" />
       <Folder Include="Tools\ECP\ECPCreateScheduleOrderDetail\viewModel\" />
       <Folder Include="Tools\ECP\ECPCreateScheduleOrderDetail\model\" />
