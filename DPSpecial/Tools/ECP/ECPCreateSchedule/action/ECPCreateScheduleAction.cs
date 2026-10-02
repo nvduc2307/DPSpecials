@@ -3,6 +3,9 @@ using DPSpecial.Tools.ECP.ECPCreateSchedule.schema;
 using DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.model;
 using DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.view;
 using DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.viewModel;
+using Autodesk.Revit.UI;
+using DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action;
+using DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model;
 using DPSpecial.Tools.ECP.ECPZoneInstall.schema;
 using DPSpecial.Tools.ECP.ECPZoneManage.model;
 using DPSpecial.Tools.ECP.ECPZoneManage.schema;
@@ -22,14 +25,17 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
         // EN: Weight per unit area of ECP base material (kg/m²)
         private const double WEIGHT_PER_M2 = 15.4;
 
+        private readonly UIDocument _uidocument;
         private readonly Document _document;
         private readonly ECPOrderScheduleSchema _orderScheduleSchema;
         private ECPCreateScheduleVM _viewModel;
         private ECPCreateScheduleView _view;
+        private (ECPOrderScheduleModel Order, List<ECPOrderDetailRowModel> Rows)? _pendingDetail;
 
-        public ECPCreateScheduleAction(Document document)
+        public ECPCreateScheduleAction(UIDocument uidocument)
         {
-            _document = document;
+            _uidocument = uidocument;
+            _document = uidocument.Document;
             _orderScheduleSchema = new ECPOrderScheduleSchema(ECPOrderScheduleSchema.GUID, ECPOrderScheduleSchema.NAME);
 
             _viewModel = new ECPCreateScheduleVM
@@ -48,14 +54,15 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
                 CheckAllOnCommand = new RelayCommand(_CheckAllOnCommand),
                 CheckAllOffCommand = new RelayCommand(_CheckAllOffCommand),
                 PrintListCommand = new RelayCommand(_PrintListCommand),
-                OrderSlipCommand = new RelayCommand(_OrderSlipCommand),
+                OrderSlipCommand = new RelayCommand(_OrderSlipCommand, () => _viewModel.Orders.Any(o => o.IsChecked)),
                 CsvCommand = new RelayCommand(_CsvCommand),
                 ItemCountCommand = new RelayCommand(_ItemCountCommand),
                 CopyOrderWithDetailCommand = new RelayCommand(_CopyOrderWithDetailCommand),
                 CopyOrderWithoutDetailCommand = new RelayCommand(_CopyOrderWithoutDetailCommand),
                 InquiryCommand = new RelayCommand(_InquiryCommand),
-                ModifyCommand = new RelayCommand(_ModifyCommand),
+                ModifyCommand = new RelayCommand(_ModifyCommand, () => _viewModel.SelectedOrder != null),
                 DeleteCommand = new RelayCommand(_DeleteCommand),
+                SaveCommand = new RelayCommand(_SaveCommand),
                 BackCommand = new RelayCommand(_BackCommand),
                 // JP: ヘッダーの3状態チェックボックス（オーダー票印刷の全選択/全解除/不確定）
                 // VI: Checkbox 3 trạng thái ở header (chọn hết/bỏ chọn hết/không xác định)
@@ -76,9 +83,28 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
             _view = new ECPCreateScheduleView { DataContext = _viewModel };
         }
 
+        // JP: 「修正」で一覧画面を閉じた場合は、明細画面を開き、閉じたら一覧画面を作り直して再表示する
+        //     ※ Hide/Show ではなく Close + 再作成にするのは、モーダルを維持したままだと Revit の API コンテキストが失われ、
+        //       戻るボタンの Transaction.Start() が失敗するため
+        // VI: Nếu danh sách bị đóng do bấm "修正" thì mở màn hình chi tiết, đóng xong thì tạo lại danh sách và mở lại.
+        //     Dùng Close + tạo lại thay vì Hide/Show vì giữ dialog modal làm mất API context của Revit,
+        //     khiến Transaction.Start() ở nút Back bị lỗi
+        // EN: If the list was closed by "修正", open the detail window, then rebuild and re-show the list when it closes.
+        //     Close + rebuild is used instead of Hide/Show because keeping the modal alive loses Revit's API context,
+        //     which made Transaction.Start() in the Back button fail
         public void Execute()
         {
-            _view.ShowDialog();
+            while (true)
+            {
+                _view.ShowDialog();
+                if (_pendingDetail == null) return;
+
+                var (order, rows) = _pendingDetail.Value;
+                _pendingDetail = null;
+                new ECPCreateScheduleOrderDetailAction(_uidocument, order, rows, _viewModel.Header.BranchOffice, order.ZoneId).Execute();
+
+                _view = new ECPCreateScheduleView { DataContext = _viewModel };
+            }
         }
 
         #region Load / Merge / Save
@@ -330,6 +356,7 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
                     PropertyName = _viewModel.Header.PropertyName,
                     DealerName = _viewModel.Header.DealerName,
                     DealerDivision = _viewModel.Header.DealerDivision,
+                    ZoneId = zone.Id,
                     OrderNo = zone.OrderNo,
                     PropertyRegNo = zone.PropertyRegNo,
                     PropertyDetail = zone.Name,
@@ -453,20 +480,126 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
             else newState = null; // JP:一部だけON = 不確定 VI:chỉ một phần ON = không xác định EN:some but not all on = indeterminate
 
             _viewModel.SetIsAllCheckedFromRows(newState);
+            _viewModel.OrderSlipCommand?.NotifyCanExecuteChanged();
         }
 
         // JP: 以下のボタンは未実装のスタブ（クリックすると案内メッセージを表示するだけ）
         // VI: Các nút dưới đây chỉ là stub chưa triển khai (bấm vào chỉ hiện thông báo)
         // EN: The buttons below are unimplemented stubs (clicking just shows an info message)
         private void _PrintListCommand() => IO.ShowInfo("一覧印刷は未実装です"); // VI: Chưa triển khai In danh sách / EN: Print list not implemented
-        private void _OrderSlipCommand() => IO.ShowInfo("オーダー票発行は未実装です"); // VI: Chưa triển khai Xuất phiếu đặt hàng / EN: Issue order slip not implemented
         private void _CsvCommand() => IO.ShowInfo("CSV出力は未実装です"); // VI: Chưa triển khai Xuất CSV / EN: Export CSV not implemented
         private void _ItemCountCommand() => IO.ShowInfo("品種計は未実装です"); // VI: Chưa triển khai Thống kê theo chủng loại / EN: Item-type totals not implemented
         private void _CopyOrderWithDetailCommand() => IO.ShowInfo("コピー受注(明細有)は未実装です"); // VI: Chưa triển khai Sao chép đơn hàng (có chi tiết) / EN: Copy order with detail not implemented
         private void _CopyOrderWithoutDetailCommand() => IO.ShowInfo("コピー受注(明細無)は未実装です"); // VI: Chưa triển khai Sao chép đơn hàng (không chi tiết) / EN: Copy order without detail not implemented
         private void _InquiryCommand() => IO.ShowInfo("照会は未実装です"); // VI: Chưa triển khai Tra cứu / EN: Inquiry not implemented
-        private void _ModifyCommand() => IO.ShowInfo("修正は未実装です"); // VI: Chưa triển khai Sửa / EN: Modify not implemented
         private void _DeleteCommand() => IO.ShowInfo("削除は未実装です"); // VI: Chưa triển khai Xóa / EN: Delete not implemented
+
+        // JP: オーダー票ボタン — チェックされたゾーンのオーダー票を1つのPDFにまとめて出力する（ゾーンごとに新しいページ）
+        // VI: Nút オーダー票 — xuất phiếu đặt hàng của các zone được check gộp thành 1 PDF (mỗi zone bắt đầu từ trang mới)
+        // EN: Order slip button — export the order slips of the checked zones into one PDF (each zone starts on a new page)
+        private void _OrderSlipCommand()
+        {
+            var checkedOrders = _viewModel.Orders.Where(o => o.IsChecked).ToList();
+            if (!checkedOrders.Any()) return;
+
+            using var dialog = new System.Windows.Forms.SaveFileDialog
+            {
+                Filter = "PDF (*.pdf)|*.pdf",
+                FileName = "order",
+            };
+            if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+
+            try
+            {
+                var slips = checkedOrders.Select(o => new ECPOrderSlipPdfExporter.Slip
+                {
+                    Header = ECPCreateScheduleOrderDetailAction.BuildHeader(_document, o, _viewModel.Header.BranchOffice, o.ZoneId),
+                    Rows = GetDetailRows(o.ZoneId),
+                }).ToList();
+                ECPOrderSlipPdfExporter.Export(slips, dialog.FileName);
+                IO.ShowInfo($"Exported {checkedOrders.Count} order(s) to:\n{dialog.FileName}");
+            }
+            catch (Exception ex)
+            {
+                IO.ShowWarning(ex.Message);
+            }
+        }
+
+        // JP: 修正ボタン — 一覧画面を隠して明細画面を開き、明細画面が閉じたら一覧画面を再表示する
+        // VI: Nút Sửa — ẩn màn hình danh sách, mở màn hình chi tiết; khi chi tiết đóng thì hiện lại danh sách
+        // EN: Modify button — hide the list window, open the detail window, re-show the list when the detail closes
+        private void _ModifyCommand()
+        {
+            var order = _viewModel.SelectedOrder;
+            if (order == null) return;
+
+            // JP: 選択行のゾーンに属するECP要素だけを明細行に変換する
+            // VI: Chỉ chuyển các phần tử ECP thuộc zone của dòng được chọn thành dòng chi tiết
+            // EN: Convert only the ECP elements belonging to the selected row's zone into detail rows
+            var rows = GetDetailRows(order.ZoneId);
+
+            // JP: 一覧画面を閉じるだけにして、明細画面の表示と一覧の再表示は Execute() のループで行う
+            // VI: Chỉ đóng màn hình danh sách; việc mở màn hình chi tiết và mở lại danh sách do vòng lặp trong Execute() đảm nhiệm
+            // EN: Just close the list window; opening the detail window and re-opening the list is done by the loop in Execute()
+            _pendingDetail = (order, rows);
+            _view.Close();
+        }
+
+        // JP: 指定ゾーンのECP要素を (型番, 長さ) ごとにまとめ、数量付きの明細行を作る
+        // VI: Gom các phần tử ECP của zone theo (mã loại, chiều dài) và tạo dòng chi tiết kèm số lượng
+        // EN: Group the zone's ECP elements by (type, length) and build detail rows with quantities
+        private List<ECPOrderDetailRowModel> GetDetailRows(int zoneId)
+        {
+            var rows = new List<ECPOrderDetailRowModel>();
+            if (!GetECPElementsByZone().TryGetValue(zoneId, out var elements)) return rows;
+
+            var groups = elements
+                .Select(e => new
+                {
+                    Family = e.Symbol.FamilyName,
+                    Type = e.Symbol.Name,
+                    Length = Math.Round(e.LookupParameter(WallParam.Length)?.AsDouble().ToMillimeters() ?? 0),
+                    Area = GetElementArea(e),
+                })
+                .GroupBy(x => (x.Family, x.Type, x.Length))
+                .OrderBy(g => g.Key.Type)
+                .ThenByDescending(g => g.Key.Length);
+
+            var no = 1;
+            foreach (var g in groups)
+            {
+                // JP: 面積は m²、重量は 面積 × WEIGHT_PER_M2 (kg, 整数)。注文票PDFの 基材/働き 列に使う
+                // VI: Diện tích m², khối lượng = diện tích × WEIGHT_PER_M2 (kg, số nguyên); dùng cho cột 基材/働き của PDF
+                // EN: Area in m², weight = area × WEIGHT_PER_M2 (kg, integer); used by the 基材/働き columns of the PDF
+                var baseArea = g.Sum(x => x.Area.baseAreaM2);
+                var workArea = g.Sum(x => x.Area.workAreaM2);
+                rows.Add(new ECPOrderDetailRowModel
+                {
+                    BaseArea = baseArea.ToString("F3"),
+                    BaseWeight = Math.Round(baseArea * WEIGHT_PER_M2).ToString("0"),
+                    WorkArea = workArea.ToString("F3"),
+                    WorkWeight = Math.Round(workArea * WEIGHT_PER_M2).ToString("0"),
+                    ProcessCode = "K",
+                    No = no.ToString(),
+                    ProductName = g.Key.Family,
+                    PartNumber = g.Key.Type,
+                    Length = g.Key.Length.ToString("0"),
+                    Quantity = g.Count().ToString(),
+                    IsAlternate = (no - 1) % 2 == 1,
+                });
+                no++;
+            }
+            return rows;
+        }
+
+        // JP: 保存ボタン — 画面を閉じずにデータだけ保存する
+        // VI: Nút Save — chỉ lưu dữ liệu, không đóng màn hình
+        // EN: Save button — save data and keep the window open
+        private void _SaveCommand()
+        {
+            SaveData();
+            IO.ShowInfo("保存しました");
+        }
 
         // JP: 戻るボタン — データを保存してから画面を閉じる
         // VI: Nút Back — lưu dữ liệu rồi đóng màn hình

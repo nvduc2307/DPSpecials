@@ -70,9 +70,9 @@
 
             <!-- ===== Top line ===== -->
             <TextBlock Style="{StaticResource L}" Canvas.Left="15" Canvas.Top="39" Text="物件登録No."/>
-            <TextBox Style="{StaticResource Y}" Canvas.Left="82" Canvas.Top="37" Width="66" Text="{Binding Header.PropertyRegNo}"/>
+            <TextBox Style="{StaticResource Y}" Canvas.Left="82" Canvas.Top="37" Width="66" Text="{Binding Header.PropertyRegNo, Mode=OneWay}" IsReadOnly="True"/>
             <TextBlock Style="{StaticResource L}" Canvas.Left="161" Canvas.Top="39" Text="受注No."/>
-            <TextBox Style="{StaticResource F}" Canvas.Left="203" Canvas.Top="37" Width="80" Text="{Binding Header.OrderNo}"/>
+            <TextBox Style="{StaticResource F}" Canvas.Left="203" Canvas.Top="37" Width="80" Text="{Binding Header.OrderNo, Mode=OneWay}" IsReadOnly="True"/>
             <TextBlock Style="{StaticResource L}" Canvas.Left="297" Canvas.Top="39" Text="営業担当者"/>
             <TextBox Style="{StaticResource Y}" Canvas.Left="356" Canvas.Top="37" Width="60" Text="{Binding Header.SalesStaffCode}"/>
             <TextBox Style="{StaticResource F}" Canvas.Left="420" Canvas.Top="37" Width="92" Text="{Binding Header.SalesStaffName}"/>
@@ -104,16 +104,16 @@
             <!-- ===== お客様情報 ===== -->
             <TextBlock Style="{StaticResource L}" Canvas.Left="27" Canvas.Top="79" Text="販売店"/>
             <TextBox Style="{StaticResource Y}" Canvas.Left="82" Canvas.Top="77" Width="70" Text="{Binding Header.DealerCode}"/>
-            <TextBox Style="{StaticResource F}" Canvas.Left="152" Canvas.Top="77" Width="245" Text="{Binding Header.DealerName}"/>
+            <TextBox Style="{StaticResource F}" Canvas.Left="152" Canvas.Top="77" Width="245" Text="{Binding Header.DealerName, Mode=OneWay}" IsReadOnly="True"/>
             <TextBox Style="{StaticResource F}" Canvas.Left="398" Canvas.Top="77" Width="245" Text="{Binding Header.DealerBranch}"/>
             <TextBlock Style="{StaticResource L}" Canvas.Left="654" Canvas.Top="79" Text="担当者"/>
             <TextBox Style="{StaticResource F}" Canvas.Left="700" Canvas.Top="77" Width="127" Text="{Binding Header.DealerContact}"/>
 
             <!-- ===== 物件情報 ===== -->
             <TextBlock Style="{StaticResource L}" Canvas.Left="22" Canvas.Top="144" Text="物件名称"/>
-            <TextBox Style="{StaticResource F}" Canvas.Left="82" Canvas.Top="142" Width="487" Text="{Binding Header.PropertyName}"/>
+            <TextBox Style="{StaticResource F}" Canvas.Left="82" Canvas.Top="142" Width="487" Text="{Binding Header.PropertyName, Mode=OneWay}" IsReadOnly="True"/>
             <TextBlock Style="{StaticResource L}" Canvas.Left="591" Canvas.Top="144" Text="物件詳細"/>
-            <TextBox Style="{StaticResource F}" Canvas.Left="648" Canvas.Top="142" Width="310" Text="{Binding Header.PropertyDetail}"/>
+            <TextBox Style="{StaticResource F}" Canvas.Left="648" Canvas.Top="142" Width="310" Text="{Binding Header.PropertyDetail, Mode=OneWay}" IsReadOnly="True"/>
 
             <TextBlock Style="{StaticResource L}" Canvas.Left="27" Canvas.Top="165" Text="届け先"/>
             <TextBlock Style="{StaticResource L}" Canvas.Left="76" Canvas.Top="165" Text="〒"/>
@@ -190,7 +190,7 @@
 
             <!-- ===== 希望納期 ===== -->
             <TextBlock Style="{StaticResource L}" Canvas.Left="1017" Canvas.Top="87" Text="希望納期"/>
-            <TextBox Style="{StaticResource F}" Canvas.Left="1108" Canvas.Top="85" Width="64" Text="{Binding Header.DesiredDate}"/>
+            <TextBox Style="{StaticResource F}" Canvas.Left="1108" Canvas.Top="85" Width="64" Text="{Binding Header.DesiredDate, Mode=OneWay}" IsReadOnly="True"/>
 
             <!-- ===== 回答納期 ===== -->
             <TextBlock Style="{StaticResource LR}" Canvas.Left="990" Canvas.Top="147" Width="108" Text="最終出荷日"/>
@@ -247,8 +247,8 @@
                         <Setter Property="FontSize" Value="11"/>
                         <Setter Property="HorizontalContentAlignment" Value="Center"/>
                         <Setter Property="VerticalContentAlignment" Value="Center"/>
-                        <Setter Property="BorderBrush" Value="#E0E0E0"/>
-                        <Setter Property="BorderThickness" Value="0,0,1,0"/>
+                        <Setter Property="BorderBrush" Value="#B0B0B0"/>
+                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
                     </Style>
                 </DataGrid.ColumnHeaderStyle>
                 <DataGrid.RowStyle>
@@ -267,7 +267,9 @@
                 </DataGrid.RowStyle>
                 <DataGrid.CellStyle>
                     <Style TargetType="DataGridCell">
-                        <Setter Property="BorderThickness" Value="0"/>
+                        <!-- Column border: right edge of every cell, plus a bottom edge as the row separator -->
+                        <Setter Property="BorderBrush" Value="#B0B0B0"/>
+                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
                         <Setter Property="Background" Value="Transparent"/>
                         <Setter Property="Foreground" Value="#222222"/>
                         <Style.Triggers>
@@ -454,25 +456,25 @@
             <!-- ===== Totals ===== -->
             <Button Style="{StaticResource SumBtn}" Canvas.Left="12" Canvas.Top="925" Width="70" Content="合計"/>
             <Button Style="{StaticResource SumBtn}" Canvas.Left="95" Canvas.Top="925" Width="40" Content="実枚"/>
-            <TextBox Style="{StaticResource Sum}" Canvas.Left="143" Canvas.Top="925" Width="32" Text="{Binding Header.ActualCount}"/>
+            <TextBox Style="{StaticResource Sum}" Canvas.Left="143" Canvas.Top="925" Width="32" Text="{Binding Header.ActualCount, Mode=OneWay}" IsReadOnly="True"/>
             <TextBlock Style="{StaticResource L}" Canvas.Left="178" Canvas.Top="928" Text="枚"/>
             <Button Style="{StaticResource SumBtn}" Canvas.Left="205" Canvas.Top="925" Width="50" Content="換枚"/>
-            <TextBox Style="{StaticResource Sum}" Canvas.Left="268" Canvas.Top="925" Width="88" Text="{Binding Header.ExchangeCount}"/>
+            <TextBox Style="{StaticResource Sum}" Canvas.Left="268" Canvas.Top="925" Width="88" Text="{Binding Header.ExchangeCount, Mode=OneWay}" IsReadOnly="True"/>
             <TextBlock Style="{StaticResource L}" Canvas.Left="360" Canvas.Top="928" Text="枚"/>
             <Button Style="{StaticResource SumBtn}" Canvas.Left="372" Canvas.Top="925" Width="58" Content="基材面積"/>
-            <TextBox Style="{StaticResource Sum}" Canvas.Left="432" Canvas.Top="925" Width="100" Text="{Binding Header.BaseArea}"/>
+            <TextBox Style="{StaticResource Sum}" Canvas.Left="432" Canvas.Top="925" Width="100" Text="{Binding Header.BaseArea, Mode=OneWay}" IsReadOnly="True"/>
             <TextBlock Style="{StaticResource L}" Canvas.Left="536" Canvas.Top="928" Text="m²"/>
             <Button Style="{StaticResource SumBtn}" Canvas.Left="556" Canvas.Top="925" Width="58" Content="基材重量"/>
-            <TextBox Style="{StaticResource Sum}" Canvas.Left="616" Canvas.Top="925" Width="75" Text="{Binding Header.BaseWeight}"/>
+            <TextBox Style="{StaticResource Sum}" Canvas.Left="616" Canvas.Top="925" Width="75" Text="{Binding Header.BaseWeight, Mode=OneWay}" IsReadOnly="True"/>
             <TextBlock Style="{StaticResource L}" Canvas.Left="696" Canvas.Top="928" Text="kg"/>
             <Button Style="{StaticResource SumBtn}" Canvas.Left="718" Canvas.Top="925" Width="58" Content="働き面積"/>
-            <TextBox Style="{StaticResource Sum}" Canvas.Left="778" Canvas.Top="925" Width="82" Text="{Binding Header.WorkArea}"/>
+            <TextBox Style="{StaticResource Sum}" Canvas.Left="778" Canvas.Top="925" Width="82" Text="{Binding Header.WorkArea, Mode=OneWay}" IsReadOnly="True"/>
             <TextBlock Style="{StaticResource L}" Canvas.Left="866" Canvas.Top="928" Text="m²"/>
             <Button Style="{StaticResource SumBtn}" Canvas.Left="898" Canvas.Top="925" Width="58" Content="働き重量"/>
-            <TextBox Style="{StaticResource Sum}" Canvas.Left="958" Canvas.Top="925" Width="78" Text="{Binding Header.WorkWeight}"/>
+            <TextBox Style="{StaticResource Sum}" Canvas.Left="958" Canvas.Top="925" Width="78" Text="{Binding Header.WorkWeight, Mode=OneWay}" IsReadOnly="True"/>
             <TextBlock Style="{StaticResource L}" Canvas.Left="1042" Canvas.Top="928" Text="kg"/>
             <Button Style="{StaticResource SumBtn}" Canvas.Left="1076" Canvas.Top="925" Width="50" Content="長さ"/>
-            <TextBox Style="{StaticResource Sum}" Canvas.Left="1136" Canvas.Top="925" Width="82" Text="{Binding Header.TotalLength}"/>
+            <TextBox Style="{StaticResource Sum}" Canvas.Left="1136" Canvas.Top="925" Width="82" Text="{Binding Header.TotalLength, Mode=OneWay}" IsReadOnly="True"/>
             <TextBlock Style="{StaticResource L}" Canvas.Left="1224" Canvas.Top="928" Text="m"/>
 
             <!-- ===== Footer buttons ===== -->
@@ -482,7 +484,7 @@
             <Button Style="{StaticResource FootBtn}" Canvas.Left="642" Canvas.Top="951" Content="確認印刷" Command="{Binding ConfirmPrintCommand}"/>
             <Button Style="{StaticResource FootBtn}" Canvas.Left="819" Canvas.Top="951" Content="更新情報" Command="{Binding UpdateInfoCommand}"/>
             <Button Style="{StaticResource FootBtn}" Canvas.Left="929" Canvas.Top="951" Content="確定(送信)" Command="{Binding ConfirmCommand}"/>
-            <Button Style="{StaticResource FootBtn}" Canvas.Left="1040" Canvas.Top="951" Content="保存" IsEnabled="False"/>
+            <Button Style="{StaticResource FootBtn}" Canvas.Left="1040" Canvas.Top="951" Content="保存" Command="{Binding SaveCommand}"/>
             <Button Style="{StaticResource FootBtn}" Canvas.Left="1149" Canvas.Top="951" Content="キャンセル" Command="{Binding CancelCommand}"/>
         </Canvas>
     </Grid>

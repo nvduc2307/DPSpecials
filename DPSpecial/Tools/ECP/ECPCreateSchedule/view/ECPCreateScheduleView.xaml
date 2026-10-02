@@ -157,6 +157,7 @@
         -->
         <DataGrid Grid.Row="1"
                   ItemsSource="{Binding Orders}"
+                  SelectedItem="{Binding SelectedOrder, Mode=TwoWay}"
                   AutoGenerateColumns="False"
                   CanUserSortColumns="False"
                   CanUserAddRows="False"
@@ -572,6 +573,8 @@
                 <Button Content="修正" Command="{Binding ModifyCommand}" Width="80" Height="28" Margin="5,0,0,0"/>
                 <!-- JP:削除 | VI:Xóa | EN:Delete -->
                 <Button Content="削除" Command="{Binding DeleteCommand}" Width="80" Height="28" Margin="5,0,0,0"/>
+                <!-- JP:保存（画面は閉じない） | VI:Lưu (không đóng màn hình) | EN:Save (keeps the window open) -->
+                <Button Content="保存" Command="{Binding SaveCommand}" Width="80" Height="28" Margin="5,0,0,0"/>
                 <!-- JP:戻る | VI:Quay lại | EN:Back -->
                 <Button Content="戻る" Command="{Binding BackCommand}" Width="80" Height="28" Margin="5,0,0,0"/>
             </StackPanel>

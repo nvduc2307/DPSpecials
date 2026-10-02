@@ -11,6 +11,11 @@ namespace DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.model
         [ObservableProperty]
         private bool _isChecked;
 
+        // JP: この行が属するゾーンのId（保存対象外。「修正」で明細画面に渡す要素の絞り込みに使用）
+        // VI: Id của zone mà dòng này thuộc về (không lưu; dùng để lọc phần tử khi bấm "修正")
+        // EN: Id of the zone this row belongs to (not saved; used to filter elements passed to the detail window on "修正")
+        public int ZoneId { get; set; }
+
         // JP: 受注No
         // VI: Số đơn hàng
         // EN: Order No.

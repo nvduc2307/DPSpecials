@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
 {
@@ -60,10 +61,10 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
         public string FaceName { get; set; } = string.Empty;
         private bool _gasketOn;
         public bool GasketOn { get => _gasketOn; set => SetPair(ref _gasketOn, value, nameof(GasketOn), nameof(GasketOff)); }
-        public bool GasketOff { get => !_gasketOn; set => GasketOn = !value; }
+        [JsonIgnore] public bool GasketOff { get => !_gasketOn; set => GasketOn = !value; }
         private bool _vinylOn;
         public bool VinylOn { get => _vinylOn; set => SetPair(ref _vinylOn, value, nameof(VinylOn), nameof(VinylOff)); }
-        public bool VinylOff { get => !_vinylOn; set => VinylOn = !value; }
+        [JsonIgnore] public bool VinylOff { get => !_vinylOn; set => VinylOn = !value; }
         public string HardwareCode { get; set; } = string.Empty;
         public string HardwareName { get; set; } = string.Empty;
 
@@ -80,6 +81,15 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
         // 希望納期
         public string DesiredDate { get; set; } = string.Empty;
 
+        // Order slip PDF only: 営業担当 支店 / 現場到着予定日 / 工場出荷予定日 / 加工開始予定日 / 二次加工出荷・到着予定日 / フロア
+        public string BranchOffice { get; set; } = string.Empty;
+        public string SiteArrivalDate { get; set; } = string.Empty;
+        public string FactoryShipDate { get; set; } = string.Empty;
+        public string ProcessStartDate { get; set; } = string.Empty;
+        public string SecondaryShipDate { get; set; } = string.Empty;
+        public string SecondaryArrivalDate { get; set; } = string.Empty;
+        public string Floor { get; set; } = string.Empty;
+
         // 配車情報
         public string DeliveryMethodCode { get; set; } = string.Empty;
         public string DeliveryMethodName { get; set; } = string.Empty;
@@ -91,7 +101,7 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
         public string LoadHeight { get; set; } = string.Empty;
         private bool _mapOn;
         public bool MapOn { get => _mapOn; set => SetPair(ref _mapOn, value, nameof(MapOn), nameof(MapOff)); }
-        public bool MapOff { get => !_mapOn; set => MapOn = !value; }
+        [JsonIgnore] public bool MapOff { get => !_mapOn; set => MapOn = !value; }
 
         // 断面図イメージ
         public string ConstructionDrawingNo { get; set; } = string.Empty;

@@ -16,6 +16,14 @@ namespace DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.viewModel
         // EN: Search result list (grid row data)
         public ObservableCollection<ECPOrderScheduleModel> Orders { get; set; } = new();
 
+        // JP: グリッドで選択中の行（「修正」ボタンの有効/無効の判定に使用）
+        // VI: Dòng đang được chọn trong lưới (dùng để bật/tắt nút "修正")
+        // EN: Row currently selected in the grid (drives whether "修正" is enabled)
+        [ObservableProperty]
+        private ECPOrderScheduleModel _selectedOrder;
+
+        partial void OnSelectedOrderChanged(ECPOrderScheduleModel value) => ModifyCommand?.NotifyCanExecuteChanged();
+
         private bool? _isAllChecked = false;
         // JP: 列見出しの3状態チェックボックス（オーダー票印刷）
         //     true=全行ON / false=全行OFF / null=一部の行だけON（不確定状態）
@@ -119,6 +127,11 @@ namespace DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.viewModel
         // VI: Xóa
         // EN: Delete
         public RelayCommand DeleteCommand { get; set; }
+
+        // JP: 保存（画面は閉じずにデータだけ保存）
+        // VI: Lưu (chỉ lưu dữ liệu, không đóng màn hình)
+        // EN: Save (stores the data without closing the window)
+        public RelayCommand SaveCommand { get; set; }
 
         // JP: 戻る（画面を閉じる）
         // VI: Quay lại (đóng màn hình)

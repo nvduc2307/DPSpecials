@@ -1,5 +1,6 @@
 using Autodesk.Revit.UI;
 using DPSpecial.Contains;
+using DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action;
 using DPSpecial.Tools.ECP.ECPZoneInstall.action;
 using DPSpecial.Tools.ECP.ECPZoneInstall.schema;
 using DPSpecial.Tools.ECP.ECPZoneManage.model;
@@ -48,6 +49,7 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
             // 3. Scan each element, compare assigned zone vs current zone definition.
             var updatedCount = 0;
             var removedCount = 0;
+            var headerCount = 0;
             var view = _document.ActiveView;
             // Overrides are only (re)applied in the zone-setting view, using the same pattern as Install Zone.
             var isSettingView = view.Name.Contains(ECPZoneDimensionHelper.NameViewSettingZone);
@@ -99,6 +101,9 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
                     updatedCount++;
                 }
 
+                // Saved order-detail headers are referenced by zone id: refresh their zone-derived values too.
+                headerCount = ECPOrderDetailHeaderStore.SyncWithZones(_document, zones);
+
                 ts.Commit();
             }
 
@@ -108,7 +113,9 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
                 messages.Add($"Updated: {updatedCount} element(s).");
             if (removedCount > 0)
                 messages.Add($"Removed zone (zone deleted): {removedCount} element(s).");
-            if (updatedCount == 0 && removedCount == 0)
+            if (headerCount > 0)
+                messages.Add($"Order headers updated: {headerCount}.");
+            if (updatedCount == 0 && removedCount == 0 && headerCount == 0)
                 messages.Add("All ECP zones are up to date. No changes needed.");
 
             IO.ShowInfo(string.Join("\n", messages));

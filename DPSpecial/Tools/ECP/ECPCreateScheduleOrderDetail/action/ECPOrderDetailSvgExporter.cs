@@ -8,10 +8,11 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
     // The geometry mirrors the shapes drawn in ECPCreateScheduleOrderDetailView.xaml (80 x 28 canvas).
     public static class ECPOrderDetailSvgExporter
     {
-        private const string OutlineDoubleTongue = "M3,7 L12,7 L12,2 L66,2 L66,7 L77,7 L77,21 L66,21 L66,26 L12,26 L12,21 L3,21 Z";
-        private const string OutlineTongueGroove = "M3,7 L12,7 L12,2 L77,2 L77,8 L68,8 L68,20 L77,20 L77,26 L12,26 L12,21 L3,21 Z";
-        private const string BlockDoubleTongue = "M54,3 L66,3 L66,8 L76,8 L76,20 L66,20 L66,25 L54,25 Z";
-        private const string BlockTongueGroove = "M54,3 L76,3 L76,8 L69,8 L69,20 L76,20 L76,25 L54,25 Z";
+        // Shared with ECPOrderSlipPdfExporter so the PDF draws the same shapes.
+        public const string OutlineDoubleTongue = "M3,7 L12,7 L12,2 L66,2 L66,7 L77,7 L77,21 L66,21 L66,26 L12,26 L12,21 L3,21 Z";
+        public const string OutlineTongueGroove = "M3,7 L12,7 L12,2 L77,2 L77,8 L68,8 L68,20 L77,20 L77,26 L12,26 L12,21 L3,21 Z";
+        public const string BlockDoubleTongue = "M54,3 L66,3 L66,8 L76,8 L76,20 L66,20 L66,25 L54,25 Z";
+        public const string BlockTongueGroove = "M54,3 L76,3 L76,8 L69,8 L69,20 L76,20 L76,25 L54,25 Z";
 
         // Returns the files written. One file per distinct type + shape kind; when a type appears with
         // several shape kinds, the non-normal kinds get a "_<kind>" suffix so nothing is overwritten.

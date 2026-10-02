@@ -96,12 +96,6 @@ namespace DPSpecial
             panel.AddPushButton<ECPCreateScheduleCmd>("create\nschedule")
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
-
-            //panel.AddPushButton<ECPCreateScheduleOrderDetailCmd>("order\ndetail")
-            //    .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
-            //    .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
-
-            
         }
     }
 }

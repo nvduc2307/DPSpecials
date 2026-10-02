@@ -24,7 +24,7 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule
                     if (zoneUpdateCheck.HasZoneChanged())
                         throw new Exception("Zone definitions have been changed.\nPlease run \"Update Zone\" before creating schedule.");
 
-                    var action = new ECPCreateScheduleAction(document);
+                    var action = new ECPCreateScheduleAction(uiDocument);
                     action.Execute();
                     tsg.Assimilate();
                 }

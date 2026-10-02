@@ -24,6 +24,17 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
 
         // 寸法[mm]
         public string Dimension { get; set; } = string.Empty;
+        // リブ / 角度 / 加工コード (printed on the order slip PDF only)
+        public string Rib { get; set; } = string.Empty;
+        public string Angle { get; set; } = string.Empty;
+        public string ProcessCode { get; set; } = string.Empty;
+        // 基材 面積[m²] / 重量[kg], 働き 面積[m²] / 重量[kg], 役物 長さ[m] / 重量[kg] (order slip PDF only)
+        public string BaseArea { get; set; } = string.Empty;
+        public string BaseWeight { get; set; } = string.Empty;
+        public string WorkArea { get; set; } = string.Empty;
+        public string WorkWeight { get; set; } = string.Empty;
+        public string AccessoryLength { get; set; } = string.Empty;
+        public string AccessoryWeight { get; set; } = string.Empty;
         // Every other row is tinted cyan.
         public bool IsAlternate { get; set; }
     }
