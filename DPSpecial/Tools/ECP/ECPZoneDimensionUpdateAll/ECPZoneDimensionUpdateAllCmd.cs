@@ -1,30 +1,24 @@
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
-using DPSpecial.Tools.ECP.ECPCreateSchedule.action;
-using DPSpecial.Tools.ECP.ECPZoneUpdate.action;
+using DPSpecial.Tools.ECP.ECPZoneDimensionUpdateAll.action;
 using DPSpecial.Utils;
 
-namespace DPSpecial.Tools.ECP.ECPCreateSchedule
+namespace DPSpecial.Tools.ECP.ECPZoneDimensionUpdateAll
 {
     [Transaction(TransactionMode.Manual)]
-    public class ECPCreateScheduleCmd : IExternalCommand
+    public class ECPZoneDimensionUpdateAllCmd : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-
             var result = Result.Succeeded;
             var uiDocument = commandData.Application.ActiveUIDocument;
             var document = uiDocument.Document;
-            using (var tsg = new TransactionGroup(document, "Command"))
+            using (var tsg = new TransactionGroup(document, "ECPZoneDimensionUpdateAllCmd"))
             {
                 tsg.Start();
                 try
                 {
-                    var zoneUpdateCheck = new ECPZoneUpdateAction(uiDocument);
-                    if (zoneUpdateCheck.HasZoneChanged())
-                        throw new Exception("Zone definitions have been changed.\nPlease run \"Update Zone\" before creating schedule.");
-
-                    var action = new ECPCreateScheduleAction(uiDocument);
+                    var action = new ECPZoneDimensionUpdateAllAction(uiDocument);
                     action.Execute();
                     tsg.Assimilate();
                 }
@@ -37,7 +31,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule
                 }
             }
             return result;
-
         }
     }
 }

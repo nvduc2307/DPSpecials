@@ -470,6 +470,11 @@
     
     <ItemGroup>
       <Folder Include="Tools\ALC\" />
+      <Folder Include="Tools\ECP\ECPCreateScheduleOrderDetail\imgs\" />
+      <Folder Include="Tools\ECP\ECPCreateScheduleOrderDetail\view\" />
+      <Folder Include="Tools\ECP\ECPCreateScheduleOrderDetail\viewModel\" />
+      <Folder Include="Tools\ECP\ECPCreateScheduleOrderDetail\model\" />
+      <Folder Include="Tools\ECP\ECPCreateScheduleOrderDetail\action\" />
     </ItemGroup>
   <Target Name="PostBuild" AfterTargets="Build">
     <Exec Command="xcopy &quot;$(TargetDir)publish\Revit $(RevitVersion) $(Configuration) addin\*&quot; &quot;$(ProjectDir)..\..\InnoSetup\Content\$(RevitVersion)\&quot; /E /H /C /I /K /Y" />

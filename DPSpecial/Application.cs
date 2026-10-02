@@ -1,11 +1,16 @@
 using DPSpecial.Tools.DPWallParameter;
 using DPSpecial.Tools.ECP.ECPCreate;
 using DPSpecial.Tools.ECP.ECPCreateSchedule;
+using DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail;
 using DPSpecial.Tools.ECP.ECPFamilyImport;
 using DPSpecial.Tools.ECP.ECPModifyWidth;
 using DPSpecial.Tools.ECP.ECPShapes;
+using DPSpecial.Tools.ECP.ECPZoneDimensionUpdate;
+using DPSpecial.Tools.ECP.ECPZoneDimensionUpdateAll;
 using DPSpecial.Tools.ECP.ECPZoneInstall;
 using DPSpecial.Tools.ECP.ECPZoneManage;
+using DPSpecial.Tools.ECP.ECPZoneManageViews;
+using DPSpecial.Tools.ECP.ECPZoneManageViewsSetting;
 using DPSpecial.Tools.ECP.ECPZoneUpdate;
 using Nice3point.Revit.Extensions.UI;
 using Nice3point.Revit.Toolkit.External;
@@ -21,6 +26,7 @@ namespace DPSpecial
         {
             CreateRibbonGeneral();
             CreateRibbonECP();
+            CreateRibbonECPZone();
             CreateRibbonECPSchedule();
         }
         private void CreateRibbonGeneral()
@@ -47,11 +53,15 @@ namespace DPSpecial
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
         }
-        private void CreateRibbonECPSchedule()
+        private void CreateRibbonECPZone()
         {
-            var panel = Application.CreatePanel("ECP Schedule", "DPSpecial");
+            var panel = Application.CreatePanel("ECP Zone", "DPSpecial");
 
-            panel.AddPushButton<ECPShapeCmd>("shape")
+            panel.AddPushButton<ECPZoneManageViewsCmd>("zone\nviews")
+                .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
+                .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
+
+            panel.AddPushButton<ECPZoneManageViewsSettingCmd>("zone views\nsetting")
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
 
@@ -63,14 +73,29 @@ namespace DPSpecial
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
 
+            panel.AddPushButton<ECPZoneDimensionUpdateCmd>("update\ndimension")
+                .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
+                .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
+
+            panel.AddPushButton<ECPZoneDimensionUpdateAllCmd>("update all\ndimension")
+                .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
+                .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
+
             panel.AddPushButton<ECPZoneUpdateCmd>("update\nzone")
+                .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
+                .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
+        }
+        private void CreateRibbonECPSchedule()
+        {
+            var panel = Application.CreatePanel("ECP Schedule", "DPSpecial");
+
+            panel.AddPushButton<ECPShapeCmd>("shape")
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
 
             panel.AddPushButton<ECPCreateScheduleCmd>("create\nschedule")
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
-
         }
     }
 }

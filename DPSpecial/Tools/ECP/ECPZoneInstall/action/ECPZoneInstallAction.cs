@@ -1,5 +1,6 @@
 using Autodesk.Revit.UI;
 using DPSpecial.Contains;
+using WallParam = DPSpecial.MVVM.Models.WallParameterName;
 using DPSpecial.Tools.ECP.ECPZoneInstall.schema;
 using DPSpecial.Tools.ECP.ECPZoneUpdate.action;
 using DPSpecial.Tools.ECP.ECPZoneInstall.view;
@@ -17,6 +18,7 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
         private readonly UIDocument _uidocument;
         private readonly Document _document;
         private readonly ECPZoneAssignSchema _assignSchema;
+        private readonly ECPZoneDimensionHelper _dimensionHelper;
         private readonly ECPZoneInstallVM _viewModel;
         private readonly ECPZoneInstallView _view;
 
@@ -37,6 +39,7 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
 
             var zoneSchema = new ECPZoneSchema(ECPZoneSchema.GUID, ECPZoneSchema.NAME);
             _assignSchema = new ECPZoneAssignSchema(ECPZoneAssignSchema.GUID, ECPZoneAssignSchema.NAME);
+            _dimensionHelper = new ECPZoneDimensionHelper(_document);
 
             var zones = GetZones(zoneSchema);
             if (!zones.Any())
@@ -80,37 +83,53 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
             _view.Hide();
             var color = ParseColor(zone.Color);
             var view = _document.ActiveView;
+            var patternId = GetDiagonalCrosshatchPatternId();
 
-            using (var ts = new Transaction(_document, "Install ECP Zone"))
+            // One transaction per pick so the overrides apply as soon as the selection is finished,
+            // instead of waiting for the user to press Esc.
+            var isDo = true;
+            do
             {
-                ts.Start();
-                var isDo = true;
-                do
+                IList<Element> elements;
+                try
                 {
+                    elements = _uidocument.Selection.PickElements(
+                        _document,
+                        null,
+                        _ECPSelectFilter,
+                        $"Pick ECP element for zone \"{zone.Name}\" (Esc to stop)...");
+                }
+                catch (Exception)
+                {
+                    break;
+                }
+                if (elements == null || !elements.Any()) continue;
+
+                using (var ts = new Transaction(_document, "Install ECP Zone"))
+                {
+                    ts.Start();
                     try
                     {
-                        var elements = _uidocument.Selection.PickElements(
-                            _document,
-                            null,
-                            _ECPSelectFilter,
-                            $"Pick ECP element for zone \"{zone.Name}\" (Esc to stop)...");
-                        if (elements == null) continue;
-                        if (!elements.Any()) continue;
+                        _dimensionHelper.InitTextTypes();
                         foreach (var element in elements)
                         {
                             _assignSchema.Write(element, JsonConvert.SerializeObject(zone));
-                            TintElement(view, element, color);
+                            TintElement(view, element, color, patternId);
                             WriteParamterElement(element, zone.Name);
+                            if (element is FamilyInstance instance)
+                                _dimensionHelper.Update(instance);
                         }
                         _document.Regenerate();
+                        ts.Commit();
                     }
                     catch (Exception)
                     {
+                        ts.RollBack();
                         isDo = false;
                     }
-                } while (isDo);
-                ts.Commit();
-            }
+                }
+                _uidocument.RefreshActiveView();
+            } while (isDo);
 
             _view.ShowDialog();
         }
@@ -138,13 +157,30 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
         }
 
         // Tints the element in the active view so the assigned zone is visible at a glance.
-        private void TintElement(Autodesk.Revit.DB.View view, Element element, Color color)
+        private void TintElement(Autodesk.Revit.DB.View view, Element element, Color color, ElementId patternId)
         {
             var overrides = new OverrideGraphicSettings();
+            if (patternId != ElementId.InvalidElementId)
+            {
+                overrides.SetSurfaceForegroundPatternId(patternId);
+                overrides.SetSurfaceForegroundPatternVisible(true);
+            }
             overrides.SetSurfaceForegroundPatternColor(color);
             overrides.SetProjectionLineColor(color);
             overrides.SetSurfaceTransparency(30);
             view.SetElementOverrides(element.Id, overrides);
+        }
+
+        // "Diagonal crosshatch" fill pattern used for the surface foreground override.
+        private ElementId GetDiagonalCrosshatchPatternId()
+        {
+            var patterns = new FilteredElementCollector(_document)
+                .OfClass(typeof(FillPatternElement))
+                .Cast<FillPatternElement>()
+                .ToList();
+            var pattern = patterns.FirstOrDefault(x => string.Equals(x.Name, "Diagonal crosshatch", StringComparison.OrdinalIgnoreCase))
+                ?? patterns.FirstOrDefault(x => x.Name.IndexOf("Diagonal crosshatch", StringComparison.OrdinalIgnoreCase) >= 0);
+            return pattern?.Id ?? ElementId.InvalidElementId;
         }
 
         private Color ParseColor(string hex)
