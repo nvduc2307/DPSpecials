@@ -106,6 +106,7 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
         private static void EmitGeometry(Geometry geometry, Brush fill, Pen stroke, Matrix m, StringBuilder sb)
         {
             var fillColor = (fill as SolidColorBrush)?.Color;
+            if (fillColor is { A: 0 }) fillColor = null; // fully transparent: nothing to paint
             var strokeColor = stroke != null && stroke.Thickness > 0 ? (stroke.Brush as SolidColorBrush)?.Color : null;
             if (fillColor == null && strokeColor == null) return;
 
@@ -307,29 +308,13 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
                 Text(dc, totals[i], ColX[11 + i] - 8, tTop + 14, 14.5, align: TextAlignment.Right, font: NumFont);
         }
 
-        // 縦切図: same outline geometry as the SVG export (80 x 28 canvas), scaled to fit the 114-unit-wide cell.
+        // 縦切図: the row's SVG drawing (80 x 28 canvas), scaled to fit the 114-unit-wide cell.
         private static void DrawShape(DrawingContext dc, ECPOrderDetailRowModel row, double cellX, double rowTop)
         {
             const double scale = 1.38;
-            var doubleTongue = row.Profile == "DoubleTongue";
-            var t = new TranslateTransform(cellX + 6 - 3 * scale, rowTop + 7 - 2 * scale);
-            var s = new ScaleTransform(scale, scale);
-            dc.PushTransform(t);
-            dc.PushTransform(s);
-
-            var outline = Geometry.Parse(doubleTongue ? ECPOrderDetailSvgExporter.OutlineDoubleTongue : ECPOrderDetailSvgExporter.OutlineTongueGroove);
-            dc.DrawGeometry(Brushes.White, new Pen(new SolidColorBrush(Color.FromRgb(0x33, 0x33, 0x33)), 0.8), outline);
-
-            if (row.ShapeKind == "FlatCut")
-            {
-                dc.DrawRectangle(Black, null, new Rect(3, 10, 5, 8));
-                Text(dc, "←ﾌﾗｯﾄ切", 10, 8.5, 7);
-            }
-            else if (row.ShapeKind == "RightBlock")
-            {
-                dc.DrawGeometry(Black, null, Geometry.Parse(doubleTongue ? ECPOrderDetailSvgExporter.BlockDoubleTongue : ECPOrderDetailSvgExporter.BlockTongueGroove));
-                dc.DrawLine(new Pen(new SolidColorBrush(Color.FromRgb(0xE0, 0x30, 0x30)), 0.8), new Point(12, 2), new Point(54, 2));
-            }
+            dc.PushTransform(new TranslateTransform(cellX + 6 - 3 * scale, rowTop + 7 - 2 * scale));
+            dc.PushTransform(new ScaleTransform(scale, scale));
+            dc.DrawDrawing(row.ImageSource.Drawing);
             dc.Pop();
             dc.Pop();
         }

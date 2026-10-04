@@ -22,17 +22,50 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
         public static ECPOrderDetailHeaderModel Find(Document document, int zoneId) =>
             Load(document).FirstOrDefault(x => x.ZoneId == zoneId)?.Header;
 
-        // Inserts or replaces the header of one zone (opens its own transaction).
-        public static void Save(Document document, int zoneId, ECPOrderDetailHeaderModel header)
+        // Inserts or replaces the header and rows of one zone (opens its own transaction).
+        public static void Save(Document document, int zoneId, ECPOrderDetailHeaderModel header, IEnumerable<ECPOrderDetailRowModel> rows)
         {
             var all = Load(document);
             all.RemoveAll(x => x.ZoneId == zoneId);
-            all.Add(new ECPOrderDetailHeaderSaveModel { ZoneId = zoneId, Header = header });
+            all.Add(new ECPOrderDetailHeaderSaveModel
+            {
+                ZoneId = zoneId,
+                Header = header,
+                Rows = rows.Select(r => new ECPOrderDetailRowSaveModel
+                {
+                    Key = r.Key,
+                    WorkNo = r.WorkNo,
+                    QuantityCode = r.QuantityCode,
+                    Dimension = r.Dimension,
+                    Rib = r.Rib,
+                    Angle = r.Angle,
+                    ProcessCode = r.ProcessCode,
+                }).ToList(),
+            });
 
             using var ts = new Transaction(document, "Save ECP Order Header");
             ts.Start();
             Write(document, all);
             ts.Commit();
+        }
+
+        // Puts the saved user-entered values back onto freshly built rows (matched by Key).
+        public static void ApplySavedRows(Document document, int zoneId, IEnumerable<ECPOrderDetailRowModel> rows)
+        {
+            var saved = Load(document).FirstOrDefault(x => x.ZoneId == zoneId)?.Rows;
+            if (saved == null || saved.Count == 0) return;
+
+            var lookup = saved.GroupBy(x => x.Key).ToDictionary(g => g.Key, g => g.First());
+            foreach (var row in rows)
+            {
+                if (!lookup.TryGetValue(row.Key, out var s)) continue;
+                row.WorkNo = s.WorkNo;
+                row.QuantityCode = s.QuantityCode;
+                row.Dimension = s.Dimension;
+                row.Rib = s.Rib;
+                row.Angle = s.Angle;
+                row.ProcessCode = s.ProcessCode;
+            }
         }
 
         // Brings the saved headers in line with the current zone definitions: the zone-derived fields

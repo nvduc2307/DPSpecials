@@ -560,8 +560,9 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
                     Type = e.Symbol.Name,
                     Length = Math.Round(e.LookupParameter(WallParam.Length)?.AsDouble().ToMillimeters() ?? 0),
                     Area = GetElementArea(e),
+                    Image = WallImage.GetImageWall(e),
                 })
-                .GroupBy(x => (x.Family, x.Type, x.Length))
+                .GroupBy(x => (x.Family, x.Type, x.Length, x.Image))
                 .OrderBy(g => g.Key.Type)
                 .ThenByDescending(g => g.Key.Length);
 
@@ -580,6 +581,7 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
                     WorkArea = workArea.ToString("F3"),
                     WorkWeight = Math.Round(workArea * WEIGHT_PER_M2).ToString("0"),
                     ProcessCode = "K",
+                    ImageName = g.Key.Image,
                     No = no.ToString(),
                     ProductName = g.Key.Family,
                     PartNumber = g.Key.Type,
@@ -589,6 +591,9 @@ namespace DPSpecial.Tools.ECP.ECPCreateSchedule.action
                 });
                 no++;
             }
+            // Fix every row key before any editing, then restore the values the user saved for this zone.
+            foreach (var r in rows) _ = r.Key;
+            ECPOrderDetailHeaderStore.ApplySavedRows(_document, zoneId, rows);
             return rows;
         }
 

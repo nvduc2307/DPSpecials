@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="80" height="28" viewBox="0 0 80 28">
-  <g transform="matrix(0 1 -1 0 80 0)">
-    <path d="M2,8 L9,8 L9,2 L19,2 L19,8 L26,8 L26,78 L19,78 L19,68 L9,68 L9,78 L2,78 Z" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
-    
-  </g>
-  <text x="40" y="16.5" font-size="9" text-anchor="middle" font-family="MS UI Gothic, Meiryo UI, sans-serif" fill="#000000">特</text>
-</svg>

@@ -479,4 +479,8 @@
   <Target Name="PostBuild" AfterTargets="Build">
     <Exec Command="xcopy &quot;$(TargetDir)publish\Revit $(RevitVersion) $(Configuration) addin\*&quot; &quot;$(ProjectDir)..\..\InnoSetup\Content\$(RevitVersion)\&quot; /E /H /C /I /K /Y" />
   </Target>
+    <ItemGroup>
+        <EmbeddedResource Include="Tools\ECP\ECPCreateScheduleOrderDetail\imgs\*.svg" />
+    </ItemGroup>
+
 </Project>

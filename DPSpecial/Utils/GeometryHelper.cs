@@ -199,7 +199,9 @@ namespace DPSpecial.Utils
         }
         public static XYZ GetCenter(this List<XYZ> ps)
         {
+            ps = ps.Where(x => x != null).ToList();
             XYZ result = null;
+            if (!ps.Any()) return result;
             try
             {
                 var minx = ps.Min(p => p.X);

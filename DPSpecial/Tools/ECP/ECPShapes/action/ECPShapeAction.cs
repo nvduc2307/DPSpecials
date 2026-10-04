@@ -19,6 +19,19 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
             _document = _uidocument.Document;
             _eCPShapeSchemal = new ECPShapeSchema(ECPShapeSchema.GUID, ECPShapeSchema.NAME);
         }
+        public static XYZ GetCenter(FamilyInstance wall)
+        {
+            XYZ result = null;
+            var paraLength = wall.LookupParameter(WallParameterName.Length);
+            var paraWidth = wall.LookupParameter(WallParameterName.Width);
+            if (paraLength == null) return result;
+            if (paraWidth == null) return result;
+            var length = Math.Round(paraLength.AsDouble().ToMillimeters(), 0);
+            var width = Math.Round(paraWidth.AsDouble().ToMillimeters(), 0);
+            var trans = wall.GetTransform();
+            result = trans.Origin + trans.BasisX * width / 2 + trans.BasisZ * length / 2;
+            return result;
+        }
         public void Execute()
         {
             ValidateView();
@@ -32,12 +45,14 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
                 {
                     try
                     {
+                        var trans = wall.GetTransform();
+                        if (!trans.BasisX.DotProduct(_document.ActiveView.ViewDirection).IsAlmostEqual(0)) continue;
                         var eCPShapeSchemalInfo = _eCPShapeSchemal.Read(wall);
                         var shapeName = GetECPShapeName(wall);
                         var shape = GetGroupECPShape(shapeName, out bool isDeleteGr);
                         if (shape == null) continue;
                         if (shape.Location == null) continue;
-                        var center = wall.GetSolid().Select(x=>x.GetCenter()).ToList().GetCenter();
+                        var center = wall.GetSolid().Select(x=>x.GetCenter()).ToList().GetCenter() ?? GetCenter(wall);
                         var vtMove = center - (shape.Location as LocationPoint)?.Point;
                         var shapeIds = ElementTransformUtils.CopyElement(_document, shape.Id, vtMove);
                         if (isDeleteGr)
