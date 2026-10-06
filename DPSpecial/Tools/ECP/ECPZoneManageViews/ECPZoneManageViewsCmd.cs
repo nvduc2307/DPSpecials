@@ -1,3 +1,4 @@
+using DPSpecial.Tools.Login.Licensing;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 using DPSpecial.Tools.ECP.ECPZoneManageViews.action;
@@ -10,6 +11,11 @@ namespace DPSpecial.Tools.ECP.ECPZoneManageViews
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            if (!LicenseGate.EnsureFeature(string.Empty))
+            {
+                return Result.Cancelled;
+            }
+
             var result = Result.Succeeded;
             var uiDocument = commandData.Application.ActiveUIDocument;
             var document = uiDocument.Document;

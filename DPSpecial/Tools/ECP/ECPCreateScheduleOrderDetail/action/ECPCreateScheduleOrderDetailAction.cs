@@ -81,7 +81,7 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
         private void SaveHeader()
         {
             if (_zoneId.HasValue)
-                ECPOrderDetailHeaderStore.Save(_document, _zoneId.Value, _viewModel.Header);
+                ECPOrderDetailHeaderStore.Save(_document, _zoneId.Value, _viewModel.Header, _viewModel.Rows);
         }
 
         // 保存: saves the header now and keeps the window open.

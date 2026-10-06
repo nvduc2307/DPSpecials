@@ -14,13 +14,28 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
         // 数量[枚] (blue code printed after the quantity)
         public string Quantity { get; set; } = string.Empty;
         public string QuantityCode { get; set; } = string.Empty;
+        // Name of the wall image (imgs<name>.svg) from WallImage.GetImageWall; empty = draw from ShapeKind / Profile.
+        public string ImageName { get; set; } = string.Empty;
+
+        private System.Windows.Media.DrawingImage _imageSource;
+        // The 縦切図 as a WPF image (the grid and the PDF both draw this).
+        public System.Windows.Media.DrawingImage ImageSource => _imageSource ??= action.SvgDrawing.ToImage(action.ECPOrderDetailSvgExporter.GetSvg(this));
+
         // 縦切図: Normal / FlatCut / RightBlock
         public string ShapeKind { get; set; } = "Normal";
-        // 縦切図 end profile, derived from the type name: a type ending in "T" (凸) has a tongue on both ends,
+        // 縦切図 end profile, derived from the type name: a type starting with "MNY" is a corner panel (slanted left end,
+        // groove on the right end), a type ending in "T" (凸) has a tongue on both ends,
         // every other type has a tongue on the left end and a groove on the right end.
-        public string Profile => (PartNumber ?? string.Empty).Trim().EndsWith("T", StringComparison.OrdinalIgnoreCase)
+        public string Profile => (PartNumber ?? string.Empty).Trim().StartsWith("MNY", StringComparison.OrdinalIgnoreCase)
+            ? "Corner"
+            : (PartNumber ?? string.Empty).Trim().EndsWith("T", StringComparison.OrdinalIgnoreCase)
             ? "DoubleTongue"
             : "TongueGroove";
+
+        // Identifies the same wall group between sessions (used to match saved rows).
+        // Fixed when the row is built (before any editing), so edits to Length etc. do not break the match.
+        private string _key;
+        public string Key { get => _key ??= $"{ProductName}|{PartNumber}|{Length}|{ImageName}"; set => _key = value; }
 
         // 寸法[mm]
         public string Dimension { get; set; } = string.Empty;

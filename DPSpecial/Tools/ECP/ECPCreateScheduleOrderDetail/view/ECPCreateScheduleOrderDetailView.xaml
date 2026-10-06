@@ -362,74 +362,7 @@
                         <DataGridTemplateColumn.Header><TextBlock Text="縦切図"/></DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Canvas Width="80" Height="28">
-                                    <Path Data="M3,7 L12,7 L12,2 L77,2 L77,8 L68,8 L68,20 L77,20 L77,26 L12,26 L12,21 L3,21 Z" Stroke="#333333" StrokeThickness="1" Fill="White">
-                                        <Path.Style>
-                                            <Style TargetType="Path">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Profile}" Value="DoubleTongue">
-                                                        <Setter Property="Data" Value="M3,7 L12,7 L12,2 L66,2 L66,7 L77,7 L77,21 L66,21 L66,26 L12,26 L12,21 L3,21 Z"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Path.Style>
-                                    </Path>
-                                    <Rectangle Canvas.Left="3" Canvas.Top="10" Width="5" Height="8" Fill="Black">
-                                        <Rectangle.Style>
-                                            <Style TargetType="Rectangle">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ShapeKind}" Value="FlatCut">
-                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Rectangle.Style>
-                                    </Rectangle>
-                                    <TextBlock Canvas.Left="10" Canvas.Top="10" Text="←ﾌﾗｯﾄ切" FontSize="8" Foreground="Black">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ShapeKind}" Value="FlatCut">
-                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                    <Path Data="M54,3 L76,3 L76,8 L69,8 L69,20 L76,20 L76,25 L54,25 Z" Fill="Black">
-                                        <Path.Style>
-                                            <Style TargetType="Path">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ShapeKind}" Value="RightBlock">
-                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                    </DataTrigger>
-                                                    <MultiDataTrigger>
-                                                        <MultiDataTrigger.Conditions>
-                                                            <Condition Binding="{Binding ShapeKind}" Value="RightBlock"/>
-                                                            <Condition Binding="{Binding Profile}" Value="DoubleTongue"/>
-                                                        </MultiDataTrigger.Conditions>
-                                                        <Setter Property="Data" Value="M54,3 L66,3 L66,8 L76,8 L76,20 L66,20 L66,25 L54,25 Z"/>
-                                                    </MultiDataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Path.Style>
-                                    </Path>
-                                    <Line X1="12" X2="54" Y1="2" Y2="2" Stroke="#E03030" StrokeThickness="1">
-                                        <Line.Style>
-                                            <Style TargetType="Line">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ShapeKind}" Value="RightBlock">
-                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Line.Style>
-                                    </Line>
-                                </Canvas>
+                                <Image Source="{Binding ImageSource}" Width="80" Height="28" Stretch="Fill"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

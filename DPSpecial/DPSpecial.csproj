@@ -442,6 +442,7 @@
         <!-- Revit References -->
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+        <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
         <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitApiVersion)" />
         <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="3.0.1" />
         <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*" />
@@ -453,6 +454,7 @@
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
       <Reference Include="System.Windows.Forms" />
+      <Reference Include="System.Net.Http" />
       <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" NoWarn="NU1605" />
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
@@ -463,6 +465,16 @@
       <PackageReference Include="MicrosoftOfficeCore" Version="15.0.0" NoWarn="NU1701" />
     </ItemGroup>
     
+    <!-- License client -->
+    <ItemGroup>
+        <Content Include="Resources\Settings\ReleaseChannel.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <EmbeddedResource Include="Resources\Settings\ReleaseProfile.dat" Condition="Exists('Resources\Settings\ReleaseProfile.dat')">
+            <LogicalName>DPSpecial.Resources.Settings.ReleaseProfile.dat</LogicalName>
+        </EmbeddedResource>
+    </ItemGroup>
+
     <ItemGroup>
         <Resource Include="Resources\Icons\RibbonIcon16.png" />
         <Resource Include="Resources\Icons\RibbonIcon32.png" />
@@ -479,4 +491,8 @@
   <Target Name="PostBuild" AfterTargets="Build">
     <Exec Command="xcopy &quot;$(TargetDir)publish\Revit $(RevitVersion) $(Configuration) addin\*&quot; &quot;$(ProjectDir)..\..\InnoSetup\Content\$(RevitVersion)\&quot; /E /H /C /I /K /Y" />
   </Target>
+    <ItemGroup>
+        <EmbeddedResource Include="Tools\ECP\ECPCreateScheduleOrderDetail\imgs\*.svg" />
+    </ItemGroup>
+
 </Project>
