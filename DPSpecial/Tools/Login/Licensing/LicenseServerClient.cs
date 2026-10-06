@@ -1,28 +1,46 @@
 using System;
+using System.IO;
 using System.Net;
-using System.Net.Http;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace DPSpecial.Tools.Login.Licensing
 {
+    /// <summary>
+    ///     Gọi license server bằng HttpWebRequest (System.dll). Không dùng System.Net.Http để tránh
+    ///     xung đột phiên bản với bản đã được Revit nạp sẵn (R22-R24 chạy .NET Framework).
+    /// </summary>
     internal sealed class LicenseServerClient
     {
-        private const int RequestTimeoutSeconds = 15;
+        private const int RequestTimeoutMilliseconds = 15000;
         private const int MaximumAttempts = 3;
         private const int RetryDelayMilliseconds = 250;
         private const int MaximumRedirects = 5;
-        private static readonly HttpClient HttpClient = CreateHttpClient();
         private readonly string _apiUrl;
+
+        static LicenseServerClient()
+        {
+#if NETFRAMEWORK
+            // Google chỉ nhận TLS 1.2 trở lên; chỉ bổ sung, không bỏ giao thức nào.
+            ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
+#endif
+        }
 
         public LicenseServerClient(string apiUrl)
         {
             _apiUrl = apiUrl;
         }
 
-        public async Task<LicenseServerCallResult> SendAsync(
+        public Task<LicenseServerCallResult> SendAsync(
+            string action,
+            string credential,
+            string deviceHash)
+        {
+            return Task.Run(() => Send(action, credential, deviceHash));
+        }
+
+        private LicenseServerCallResult Send(
             string action,
             string credential,
             string deviceHash)
@@ -35,83 +53,52 @@ namespace DPSpecial.Tools.Login.Licensing
                 Product = LeaseVerifier.ProductName,
                 RequestId = Guid.NewGuid().ToString("N")
             };
-            string requestJson = JsonConvert.SerializeObject(request);
-            string lastError =
-                "Không kết nối được dịch vụ xác nhận.";
+            byte[] body = Encoding.UTF8.GetBytes(
+                JsonConvert.SerializeObject(request));
+            string lastError = "Không kết nối được dịch vụ xác nhận.";
 
-            for (int attempt = 1;
-                 attempt <= MaximumAttempts;
-                 attempt++)
+            for (int attempt = 1; attempt <= MaximumAttempts; attempt++)
             {
                 try
                 {
-                    using (CancellationTokenSource timeout =
-                           new CancellationTokenSource(
-                               TimeSpan.FromSeconds(
-                                   RequestTimeoutSeconds)))
-                    using (StringContent content = new StringContent(
-                               requestJson,
-                               Encoding.UTF8,
-                               "application/json"))
-                    using (HttpResponseMessage response =
-                           await SendWithGoogleRedirectsAsync(
-                                   content,
-                                   timeout.Token)
-                               .ConfigureAwait(false))
+                    int status;
+                    string responseJson = PostWithRedirects(body, out status);
+
+                    LicenseServerResponse? serverResponse = null;
+                    try
                     {
-                        string responseJson =
-                            await response.Content.ReadAsStringAsync()
-                                .ConfigureAwait(false);
+                        serverResponse = JsonConvert.DeserializeObject<
+                            LicenseServerResponse>(responseJson);
+                    }
+                    catch (JsonException)
+                    {
+                    }
 
-                        if (!response.IsSuccessStatusCode)
-                        {
-                            lastError =
-                                "Dịch vụ xác nhận trả về HTTP " +
-                                (int)response.StatusCode + ".";
-                            if (attempt < MaximumAttempts &&
-                                ShouldRetry(response.StatusCode))
-                            {
-                                await DelayBeforeRetryAsync()
-                                    .ConfigureAwait(false);
-                                continue;
-                            }
-
-                            return LicenseServerCallResult.Unreachable(
-                                lastError);
-                        }
-
-                        LicenseServerResponse? serverResponse =
-                            JsonConvert.DeserializeObject<
-                                LicenseServerResponse>(
-                                responseJson);
-                        if (serverResponse == null)
-                        {
-                            lastError =
-                                "Dịch vụ xác nhận trả về dữ liệu rỗng.";
-                            if (attempt < MaximumAttempts)
-                            {
-                                await DelayBeforeRetryAsync()
-                                    .ConfigureAwait(false);
-                                continue;
-                            }
-
-                            return LicenseServerCallResult.Unreachable(
-                                lastError);
-                        }
-
+                    // Server trả JSON cho cả lỗi nghiệp vụ; chỉ lỗi hạ tầng mới thử lại.
+                    if (serverResponse != null &&
+                        !string.IsNullOrEmpty(serverResponse.Code) &&
+                        status != 500)
+                    {
                         return LicenseServerCallResult.Reachable(
                             serverResponse);
                     }
-                }
-                catch (OperationCanceledException)
-                {
+
                     lastError =
-                        "Kết nối dịch vụ xác nhận quá thời gian " +
-                        RequestTimeoutSeconds + " giây.";
+                        "Dịch vụ xác nhận trả về HTTP " + status + ".";
+                    if (!ShouldRetry(status) || attempt == MaximumAttempts)
+                    {
+                        return LicenseServerCallResult.Unreachable(lastError);
+                    }
                 }
-                catch (Exception exception) when (
-                    exception is HttpRequestException ||
-                    exception is JsonException)
+                catch (WebException exception)
+                {
+                    lastError = exception.Status == WebExceptionStatus.Timeout
+                        ? "Kết nối dịch vụ xác nhận quá thời gian " +
+                          (RequestTimeoutMilliseconds / 1000) + " giây."
+                        : "Không kết nối được dịch vụ xác nhận: " +
+                          exception.Message;
+                }
+                catch (IOException exception)
                 {
                     lastError =
                         "Không kết nối được dịch vụ xác nhận: " +
@@ -120,77 +107,92 @@ namespace DPSpecial.Tools.Login.Licensing
 
                 if (attempt < MaximumAttempts)
                 {
-                    await DelayBeforeRetryAsync().ConfigureAwait(false);
+                    System.Threading.Thread.Sleep(RetryDelayMilliseconds);
                 }
             }
 
             return LicenseServerCallResult.Unreachable(lastError);
         }
 
-        private async Task<HttpResponseMessage>
-            SendWithGoogleRedirectsAsync(
-                HttpContent content,
-                CancellationToken cancellationToken)
+        private string PostWithRedirects(byte[] body, out int statusCode)
         {
-            HttpResponseMessage response;
-            using (HttpRequestMessage request = new HttpRequestMessage(
-                       HttpMethod.Post,
-                       _apiUrl))
+            Uri uri = new Uri(_apiUrl);
+            bool isPost = true;
+
+            for (int redirect = 0; redirect <= MaximumRedirects; redirect++)
             {
-                request.Content = content;
-                response = await HttpClient.SendAsync(
-                        request,
-                        HttpCompletionOption.ResponseHeadersRead,
-                        cancellationToken)
-                    .ConfigureAwait(false);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+                request.Timeout = RequestTimeoutMilliseconds;
+                request.ReadWriteTimeout = RequestTimeoutMilliseconds;
+                request.AllowAutoRedirect = false;
+                request.UserAgent = "DPSpecial";
+                if (isPost)
+                {
+                    request.Method = "POST";
+                    request.ContentType = "application/json; charset=utf-8";
+                    request.ContentLength = body.Length;
+                    using (Stream stream = request.GetRequestStream())
+                    {
+                        stream.Write(body, 0, body.Length);
+                    }
+                }
+                else
+                {
+                    request.Method = "GET";
+                }
+
+                HttpWebResponse response;
+                try
+                {
+                    response = (HttpWebResponse)request.GetResponse();
+                }
+                catch (WebException exception)
+                    when (exception.Response is HttpWebResponse errorResponse)
+                {
+                    response = errorResponse;
+                }
+
+                using (response)
+                {
+                    statusCode = (int)response.StatusCode;
+                    if (IsRedirect(statusCode))
+                    {
+                        string location = response.Headers["Location"];
+                        Uri next;
+                        if (string.IsNullOrEmpty(location) ||
+                            !Uri.TryCreate(uri, location, out next) ||
+                            !IsTrustedGoogleRedirect(next))
+                        {
+                            return ReadBody(response);
+                        }
+
+                        // Apps Script chuyển POST sang một URL GET chứa kết quả.
+                        uri = next;
+                        isPost = false;
+                        continue;
+                    }
+
+                    return ReadBody(response);
+                }
             }
 
-            for (int redirect = 0;
-                 redirect < MaximumRedirects &&
-                 IsRedirect(response.StatusCode);
-                 redirect++)
+            statusCode = 0;
+            return string.Empty;
+        }
+
+        private static string ReadBody(HttpWebResponse response)
+        {
+            using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(
+                       stream,
+                       Encoding.UTF8))
             {
-                Uri? location = response.Headers.Location;
-                if (location == null)
-                {
-                    return response;
-                }
-
-                Uri nextUri = location.IsAbsoluteUri
-                    ? location
-                    : new Uri(new Uri(_apiUrl), location);
-                if (!IsTrustedGoogleRedirect(nextUri))
-                {
-                    return response;
-                }
-
-                response.Dispose();
-                using (HttpRequestMessage request =
-                       new HttpRequestMessage(HttpMethod.Get, nextUri))
-                {
-                    response = await HttpClient.SendAsync(
-                            request,
-                            HttpCompletionOption.ResponseHeadersRead,
-                            cancellationToken)
-                        .ConfigureAwait(false);
-                }
+                return reader.ReadToEnd();
             }
-
-            return response;
         }
 
-        private static HttpClient CreateHttpClient()
+        private static bool IsRedirect(int value)
         {
-            return new HttpClient(
-                new HttpClientHandler
-                {
-                    AllowAutoRedirect = false
-                });
-        }
-
-        private static bool IsRedirect(HttpStatusCode statusCode)
-        {
-            int value = (int)statusCode;
             return value == 301 ||
                    value == 302 ||
                    value == 303 ||
@@ -198,21 +200,15 @@ namespace DPSpecial.Tools.Login.Licensing
                    value == 308;
         }
 
-        private static bool ShouldRetry(HttpStatusCode statusCode)
+        private static bool ShouldRetry(int value)
         {
-            int value = (int)statusCode;
-            return value == 404 ||
+            return value == 0 ||
                    value == 408 ||
                    value == 429 ||
                    value == 500 ||
                    value == 502 ||
                    value == 503 ||
                    value == 504;
-        }
-
-        private static Task DelayBeforeRetryAsync()
-        {
-            return Task.Delay(RetryDelayMilliseconds);
         }
 
         private static bool IsTrustedGoogleRedirect(Uri uri)
