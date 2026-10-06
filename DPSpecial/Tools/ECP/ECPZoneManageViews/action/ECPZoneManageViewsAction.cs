@@ -84,7 +84,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneManageViews.action
                 .Cast<View>()
                 .Where(x => !x.IsTemplate)
                 .Where(x => x.ViewType == ViewType.Elevation)
-                .Where(x => !x.Name.Contains(NameViewSettingZone))
                 .OrderBy(x => x.Name)
                 .ToList();
             return views;

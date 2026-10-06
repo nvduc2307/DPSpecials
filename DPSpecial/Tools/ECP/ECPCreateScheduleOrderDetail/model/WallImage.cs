@@ -53,6 +53,16 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
                 return result;
             if (START_SLOPE_END_NORMALS.Any(x => x == nameStype))
                 return isEndWallClose ? IMG_START_SLOPE_END_NORMAL : IMG_START_SLOPE_END_CLOSE;
+            if(START_ARROW_END_NORMALS_WALL_VERTICAL.Any(x => x == nameStype))
+            {
+                var wallParamArrowHas = wall.LookupParameter(WALL_PARAM_ARROW_HAS);
+                var hasArrow = true;
+                if (wallParamArrowHas != null)
+                    hasArrow = wallParamArrowHas.AsInteger() == 0;
+                return isEndWallClose
+                    ? hasArrow ? IMG_START_ARROW_END_NORMAL : IMG_START_CLOSE_END_NORMAL
+                    : IMG_START_ARROW_END_CLOSE;
+            }
             return result;
         }
         private static bool IsEndWallClose(FamilyInstance wall)
@@ -190,6 +200,10 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
             "ECP_MNY45ー6058(メス側カット)",
             "ECP_MNY60-7560CN　ﾊｲﾚｰﾝ留め",
             "ECP_MNY61-7560CN　ﾘｯﾌﾟﾙ留め",
+        };
+        public static List<string> START_ARROW_END_NORMALS_WALL_VERTICAL = new List<string>()
+        {
+            "ECP_ヨコ貼り_左45度カット",
         };
     }
 }

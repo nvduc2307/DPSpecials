@@ -13,6 +13,14 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
         private UIDocument _uidocument;
         private Document _document;
         private ECPShapeSchema _eCPShapeSchemal;
+        // Quá thời gian này thì dừng xử lý, commit phần đã làm và kết thúc.
+        private const int TimeoutSeconds = 120;
+        // Template chỉ mở 1 lần cho cả lần chạy, mỗi hình chỉ nạp 1 lần rồi dùng lại cho mọi tường.
+        private Document _templateDoc;
+        private readonly List<ElementId> _loadedShapeIds = new List<ElementId>();
+        private readonly HashSet<string> _missingShapes = new HashSet<string>();
+        // Nhóm hình gốc đã tìm/nạp theo tên, tránh quét lại toàn bộ Group trong project cho từng tường.
+        private readonly Dictionary<string, Group> _shapeCache = new Dictionary<string, Group>();
         public ECPShapeAction(UIDocument uidocument)
         {
             _uidocument = uidocument;
@@ -34,9 +42,24 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
         }
         public void Execute()
         {
+            try
+            {
+                ExecuteCore();
+            }
+            finally
+            {
+                var closeWatch = System.Diagnostics.Stopwatch.StartNew();
+                CloseTemplate();
+                PerfLog.Write($"ECPShape: đóng template {closeWatch.ElapsedMilliseconds} ms");
+            }
+        }
+        private void ExecuteCore()
+        {
             ValidateView();
             var walls = GetWallECPs();
             if (!walls.Any()) return;
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            PerfLog.Write($"ECPShape: bắt đầu, {walls.Count} tường");
             using (var ts = new Transaction(_document, "new transaction"))
             {
                 ts.SkipAllWarnings();
@@ -46,20 +69,14 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
                     try
                     {
                         var trans = wall.GetTransform();
-                        if (!trans.BasisX.DotProduct(_document.ActiveView.ViewDirection).IsAlmostEqual(0)) continue;
                         var eCPShapeSchemalInfo = _eCPShapeSchemal.Read(wall);
                         var shapeName = GetECPShapeName(wall);
-                        var shape = GetGroupECPShape(shapeName, out bool isDeleteGr);
+                        var shape = GetGroupECPShape(shapeName);
                         if (shape == null) continue;
                         if (shape.Location == null) continue;
                         var center = wall.GetSolid().Select(x=>x.GetCenter()).ToList().GetCenter() ?? GetCenter(wall);
                         var vtMove = center - (shape.Location as LocationPoint)?.Point;
                         var shapeIds = ElementTransformUtils.CopyElement(_document, shape.Id, vtMove);
-                        if (isDeleteGr)
-                        {
-                            _document.Delete(shape.Id);
-                            _document.Regenerate();
-                        }
                         _eCPShapeSchemal.Write(wall, shapeIds.First().ToString());
                         if (string.IsNullOrEmpty(eCPShapeSchemalInfo)) continue;
 #if REVIT2022 || REVIT2023
@@ -70,8 +87,9 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
                         if (idShapeOld == null) continue;
                         try
                         {
+                            // Không Regenerate ở đây: mỗi lần buộc Revit dựng lại cả view Elevation,
+                            // Revit tự cập nhật một lần khi commit.
                             _document.Delete(idShapeOld);
-                            _document.Regenerate();
                         }
                         catch (Exception)
                         {
@@ -81,8 +99,40 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
                     {
                     }
                 }
+                PerfLog.Write($"ECPShape: xong vòng lặp tường sau {stopwatch.ElapsedMilliseconds} ms");
+                DeleteLoadedShapes();
+                _shapeCache.Clear();
+                PerfLog.Write($"ECPShape: trước Commit, {stopwatch.ElapsedMilliseconds} ms");
                 ts.Commit();
+                PerfLog.Write($"ECPShape: Commit xong, {stopwatch.ElapsedMilliseconds} ms");
             }
+        }
+        // Xoá các nhóm hình vừa nạp từ template (đã copy xong cho từng tường).
+        private void DeleteLoadedShapes()
+        {
+            foreach (var id in _loadedShapeIds)
+            {
+                try
+                {
+                    if (_document.GetElement(id) != null) _document.Delete(id);
+                }
+                catch (Exception)
+                {
+                }
+            }
+            _loadedShapeIds.Clear();
+        }
+        private void CloseTemplate()
+        {
+            try
+            {
+                if (_templateDoc is { IsValidObject: true })
+                    _templateDoc.Close(false);
+            }
+            catch (Exception)
+            {
+            }
+            _templateDoc = null;
         }
         private void ValidateView()
         {
@@ -93,13 +143,31 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
         private List<FamilyInstance> GetWallECPs()
         {
             var walls = new List<FamilyInstance>();
-            walls = new FilteredElementCollector(_document, _document.ActiveView.Id)
+            var walls_total = new FilteredElementCollector(_document, _document.ActiveView.Id)
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
                 .ToList();
-            if(!walls.Any()) return walls;
-            walls = walls.Where(x => x.Symbol.FamilyName.ToUpper().Contains("ECP")).ToList();
+            if(!walls_total.Any()) return walls;
+            var walls_ver = walls_total
+                .Where(x => ECPFamilyName.ECPVerticalFamilyName.Any(f=>f == x.Symbol.FamilyName))
+                .Where(x =>
+                {
+                    var trans = x.GetTransform();
+                    var vty = trans.BasisY;
+                    var vtx = trans.BasisX;
+                    var vtz = trans.BasisZ;
+                    var vtView = _document.ActiveView.ViewDirection;
+                    var rest = vtx.IsParallel(vtView);
+                    return rest;
+                })
+                .ToList();
+            var walls_hor = walls_total
+                .Where(x => x.Symbol.FamilyName.ToUpper().Contains("ECP"))
+                .Where(x => x.GetTransform().BasisY.IsParallel(_document.ActiveView.ViewDirection))
+                .ToList();
+            if (walls_hor.Any()) walls.AddRange(walls_hor);
+            if (walls_ver.Any()) walls.AddRange(walls_ver);
             return walls;
         }
         private string GetECPShapeName(FamilyInstance wall)
@@ -111,6 +179,7 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
             var tranfs = wall.GetTransform();
             var isWallHasArrow = ECPFamilyName.ECPFamilyNameNormal.Any(x => x == wall.Symbol.FamilyName);
             var isWallHasNotArrow = ECPFamilyName.ECPFamilyNameNotArrow.Any(x => x == wall.Symbol.FamilyName);
+            var isVerticalWall = ECPFamilyName.ECPVerticalFamilyName.Any(x => x == wall.Symbol.FamilyName);
             var paraWidthMax = wall.Symbol.LookupParameter(WallParameterName.WidthMax);
             var paraWidth = wall.LookupParameter(WallParameterName.Width);
             if (paraWidthMax == null) return result;
@@ -131,27 +200,54 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
                 else
                     result = width < widthMax ? ECPShapeName.ER5 : ECPShapeName.ER1;
             }
+            if (isVerticalWall)
+            {
+                result = width < widthMax ? ECPShapeName.EH3 : ECPShapeName.EH0;
+            }
             return result;
         }
-        private Group GetGroupECPShape(string shapeECPName, out bool isDeleteGr)
+        private Group GetGroupECPShape(string shapeECPName)
         {
-            Group group = null;
-            isDeleteGr = false;
-            if (string.IsNullOrEmpty(shapeECPName)) return group;
-            group = FindDetailGroupInstance(_document, shapeECPName);
-            if(group != null) return group;
-            group = LoadDetailGroupInstanceFromTemplate(_document, shapeECPName, _document.ActiveView);
-            isDeleteGr = true;
+            if (string.IsNullOrEmpty(shapeECPName)) return null;
+            if (_shapeCache.TryGetValue(shapeECPName, out var cached) && cached.IsValidObject) return cached;
+            // Hình đã nạp ở tường trước vẫn còn trong project nên được tìm thấy ở đây,
+            // không phải mở lại template cho từng tường.
+            var group = FindDetailGroupInstance(_document, shapeECPName);
+            if (group != null)
+            {
+                _shapeCache[shapeECPName] = group;
+                return group;
+            }
+            if (_missingShapes.Contains(shapeECPName)) return null;
+            try
+            {
+                group = LoadDetailGroupInstanceFromTemplate(_document, shapeECPName, _document.ActiveView);
+            }
+            catch (Exception)
+            {
+                _missingShapes.Add(shapeECPName);
+                throw;
+            }
+            if (group == null)
+            {
+                _missingShapes.Add(shapeECPName);
+                return null;
+            }
+            _loadedShapeIds.Add(group.Id);
+            _shapeCache[shapeECPName] = group;
             return group;
         }
         private Group LoadDetailGroupInstanceFromTemplate(Document targetDoc, string nameShape, Autodesk.Revit.DB.View targetView)
         {
             var app = targetDoc.Application;
-            Document sourceDoc = null;
             try
             {
-                var path = $"{PathHelper.Templates}\\ShapeWallECP_Template.rte";
-                sourceDoc = app.OpenDocumentFile(path);
+                if (_templateDoc is not { IsValidObject: true })
+                {
+                    var path = $"{PathHelper.Templates}\\ShapeWallECP_Template.rte";
+                    _templateDoc = app.OpenDocumentFile(path);
+                }
+                var sourceDoc = _templateDoc;
                 var group = FindDetailGroupInstance(sourceDoc, nameShape);
                 if (group == null) return null;
 
@@ -179,11 +275,6 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
-            }
-            finally
-            {
-                if (sourceDoc is { IsValidObject: true })
-                    sourceDoc.Close(false);
             }
         }
         private static Group FindDetailGroupInstance(Document doc, string nameGroup, Autodesk.Revit.DB.View view = null)

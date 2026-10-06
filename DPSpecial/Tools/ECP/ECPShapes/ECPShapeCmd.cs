@@ -11,11 +11,12 @@ namespace DPSpecial.Tools.ECP.ECPShapes
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            var total = System.Diagnostics.Stopwatch.StartNew();
             if (!LicenseGate.EnsureFeature(string.Empty))
             {
                 return Result.Cancelled;
             }
-
+            PerfLog.Write($"ECPShapeCmd: kiểm tra license {total.ElapsedMilliseconds} ms");
 
             var result = Result.Succeeded;
             var uiDocument = commandData.Application.ActiveUIDocument;
@@ -27,7 +28,9 @@ namespace DPSpecial.Tools.ECP.ECPShapes
                 {
                     var action = new ECPShapeAction(uiDocument);
                     action.Execute();
+                    PerfLog.Write($"ECPShapeCmd: Execute xong, {total.ElapsedMilliseconds} ms");
                     tsg.Assimilate();
+                    PerfLog.Write($"ECPShapeCmd: Assimilate xong, {total.ElapsedMilliseconds} ms");
                 }
                 catch (Autodesk.Revit.Exceptions.OperationCanceledException) { }
                 catch (Exception ex)

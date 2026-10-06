@@ -48,5 +48,9 @@
             "ECP_MNH-60120A(オス側カット)",
             "ECP_MNY45ー6058(メス側カット)"
         };
+        public static List<string> ECPVerticalFamilyName = new List<string>()
+        {
+            "ECP_ヨコ貼り_左45度カット",
+        };
     }
 }
