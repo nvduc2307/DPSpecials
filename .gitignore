@@ -23,3 +23,7 @@
 #Ignore Content folder in folder InnoSetup
 /InnoSetup/Content/
 /.editorconfig
+
+# License server secrets
+license-server/keys/
+DPSpecial/Resources/Settings/ReleaseProfile.dat

@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.Attributes;
+using DPSpecial.Tools.Login.Licensing;
 using Autodesk.Revit.UI;
 using DPSpecial.Tools.ECP.ECPShapes.action;
 using DPSpecial.Utils;
@@ -10,6 +11,11 @@ namespace DPSpecial.Tools.ECP.ECPShapes
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            if (!LicenseGate.EnsureFeature(string.Empty))
+            {
+                return Result.Cancelled;
+            }
+
 
             var result = Result.Succeeded;
             var uiDocument = commandData.Application.ActiveUIDocument;

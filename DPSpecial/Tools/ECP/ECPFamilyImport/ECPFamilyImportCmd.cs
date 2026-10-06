@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.Attributes;
+using DPSpecial.Tools.Login.Licensing;
 using Autodesk.Revit.UI;
 using DPSpecial.MVVM.View;
 using DPSpecial.MVVM.ViewModel;
@@ -17,6 +18,11 @@ namespace DPSpecial.Tools.ECP.ECPFamilyImport
         private ProgressView _progressView;
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            if (!LicenseGate.EnsureFeature(string.Empty))
+            {
+                return Result.Cancelled;
+            }
+
 
             var result = Result.Succeeded;
             var uiDocument = commandData.Application.ActiveUIDocument;

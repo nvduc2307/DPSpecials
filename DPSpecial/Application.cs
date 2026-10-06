@@ -12,6 +12,7 @@ using DPSpecial.Tools.ECP.ECPZoneManage;
 using DPSpecial.Tools.ECP.ECPZoneManageViews;
 using DPSpecial.Tools.ECP.ECPZoneManageViewsSetting;
 using DPSpecial.Tools.ECP.ECPZoneUpdate;
+using DPSpecial.Tools.Login.Licensing;
 using Nice3point.Revit.Extensions.UI;
 using Nice3point.Revit.Toolkit.External;
 
@@ -24,6 +25,7 @@ namespace DPSpecial
     {
         public override void OnStartup()
         {
+            OnlineLicenseService.BeginSilentActivation();
             CreateRibbonGeneral();
             CreateRibbonECP();
             CreateRibbonECPZone();
