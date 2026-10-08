@@ -5,8 +5,6 @@ using DPSpecial.Utils;
 
 namespace DPSpecial.Tools.ECP.ECPZoneDimensionUpdateAll.action
 {
-    // Puts back the shape/width/height notes of every ECP wall lying in the plane of the zone-setting view
-    // that has already been assigned a zone.
     public class ECPZoneDimensionUpdateAllAction
     {
         private readonly UIDocument _uidocument;

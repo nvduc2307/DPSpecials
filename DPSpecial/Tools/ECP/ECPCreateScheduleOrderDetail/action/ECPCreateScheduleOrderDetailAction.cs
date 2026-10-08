@@ -15,7 +15,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
         private readonly ECPCreateScheduleOrderDetailVM _viewModel;
         private readonly ECPCreateScheduleOrderDetailView _view;
 
-        // order/rows are optional: without them the screen falls back to the sample content (standalone command).
         public ECPCreateScheduleOrderDetailAction(UIDocument uidocument, ECPOrderScheduleModel order = null, List<ECPOrderDetailRowModel> rows = null, string branchOffice = null, int? zoneId = null)
         {
             _uidocument = uidocument;
@@ -37,16 +36,12 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
             _view = new ECPCreateScheduleOrderDetailView { DataContext = _viewModel };
         }
 
-        // Header of one zone: the saved one (ProjectInformation) if there is any, otherwise the defaults,
-        // with the auto-mapped values refreshed from the zone / schedule row. Also used by the order slip export.
         public static ECPOrderDetailHeaderModel BuildHeader(Document document, ECPOrderScheduleModel order, string branchOffice, int? zoneId)
         {
-            // A header saved for this zone (on ProjectInformation) wins over the defaults below.
             var saved = zoneId.HasValue ? ECPOrderDetailHeaderStore.Find(document, zoneId.Value) : null;
             var header = saved ?? CreateSampleHeader();
             if (order != null)
             {
-                // Auto-mapped values (read-only on screen) always follow the current zone / schedule / model.
                 header.OrderNo = order.OrderNo;
                 header.PropertyRegNo = order.PropertyRegNo;
                 header.PropertyDetail = order.PropertyDetail;
@@ -59,7 +54,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
                 header.WorkArea = order.WorkAreaM2;
                 header.WorkWeight = order.WorkWeight;
 
-                // Remaining fields are only initialised the first time, so the user's edits are not overwritten.
                 if (saved == null)
                 {
                     header.BranchOffice = branchOffice ?? string.Empty;
@@ -71,7 +65,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
             return header;
         }
 
-        // Closing the window (キャンセル or the X) saves the header too, like the schedule window does on 戻る.
         public void Execute()
         {
             _view.ShowDialog();
@@ -84,7 +77,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
                 ECPOrderDetailHeaderStore.Save(_document, _zoneId.Value, _viewModel.Header, _viewModel.Rows);
         }
 
-        // 保存: saves the header now and keeps the window open.
         private void _Save()
         {
             if (!_zoneId.HasValue)
@@ -103,7 +95,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
             }
         }
 
-        // Exports the 縦切図 shapes as SVG files named by type (製品番号) into a folder the user picks.
         private void _ExportSvg()
         {
             using var dialog = new System.Windows.Forms.FolderBrowserDialog { Description = "Select a folder for the SVG files" };
@@ -119,7 +110,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
             }
         }
 
-        // 添付: writes the order slip (オーダー票) PDF for this zone; extra pages are added when the rows do not fit on one.
         private void _ExportPdf()
         {
             using var dialog = new System.Windows.Forms.SaveFileDialog
@@ -144,7 +134,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
             _view.Close();
         }
 
-        // Placeholder content so the screen can be reviewed; replace with data read from the model once the logic is defined.
         private static ECPOrderDetailHeaderModel CreateSampleHeader()
         {
             return new ECPOrderDetailHeaderModel

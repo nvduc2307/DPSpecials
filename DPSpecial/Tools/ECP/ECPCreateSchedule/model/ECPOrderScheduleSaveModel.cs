@@ -1,17 +1,11 @@
 namespace DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.model
 {
-    // JP: ProjectInformation に保存するための DTO（ヘッダー＋明細行をまとめたルートオブジェクト）
-    // VI: DTO gốc chứa Header + danh sách Orders để lưu vào ProjectInformation
-    // EN: Root DTO that bundles Header + Orders list for persistence to ProjectInformation
     public class ECPOrderScheduleSaveModel
     {
         public ECPOrderScheduleHeaderSaveModel Header { get; set; } = new();
         public List<ECPOrderScheduleOrderSaveModel> Orders { get; set; } = new();
     }
 
-    // JP: ヘッダー部の保存用 DTO（ObservableProperty を持たないプレーンオブジェクト）
-    // VI: DTO lưu phần header (plain object, không có ObservableProperty)
-    // EN: Plain DTO for the header section (no ObservableProperty)
     public class ECPOrderScheduleHeaderSaveModel
     {
         public string PropertyName { get; set; } = string.Empty;
@@ -23,9 +17,6 @@ namespace DPSpecial.Tools.ECP.ECPSchedule.ECPCreateSchedule.model
         public string OrderSlipType { get; set; } = string.Empty;
     }
 
-    // JP: 明細行1行分の保存用 DTO（ObservableProperty を持たないプレーンオブジェクト）
-    // VI: DTO lưu 1 dòng chi tiết (plain object, không có ObservableProperty)
-    // EN: Plain DTO for a single order detail row (no ObservableProperty)
     public class ECPOrderScheduleOrderSaveModel
     {
         public bool IsChecked { get; set; }

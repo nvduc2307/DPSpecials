@@ -107,7 +107,6 @@ namespace DPSpecial.Tools.ECP.ECPModifyWidth.action
                 var vtCheck2 = (epNew - ep).Normalize();
                 if(vtCheck1.DotProduct(vtCheck2) < 0)
                 {
-                    //Điểm cuối của tường cuối bị ngắn đi sp ---- epNew ---- ep
                     var deltaWidthEnd = Math.Round(epNew.DistanceTo(ep).ToMillimeters(), 0) - 10.0;
                     var widthLast = Math.Round(walls.LastOrDefault().LookupParameter(WallParameterName.Width).AsDouble(), 0);
                     var wAddId = ElementTransformUtils.CopyElement(_document, walls.LastOrDefault().Id, new XYZ()).FirstOrDefault();
@@ -121,7 +120,6 @@ namespace DPSpecial.Tools.ECP.ECPModifyWidth.action
                 }
                 else
                 {
-                    //Điểm cuối của tường cuối bị dài hơn so với tường cũ sp ---- ep ---- epNew
                     var elementOutScope = new List<Element>();
                     foreach (var w in walls)
                     {
@@ -156,7 +154,6 @@ namespace DPSpecial.Tools.ECP.ECPModifyWidth.action
                     ? walls[indexTarget + 1]
                     : null;
                 if (_wallTarget == null) _view.Close();
-                //if(!_wallTarget.IsValidObject) _view.Close();
             }
             catch (Exception ex)
             {

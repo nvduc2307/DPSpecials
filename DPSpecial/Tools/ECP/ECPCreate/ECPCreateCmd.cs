@@ -26,10 +26,6 @@ namespace DPSpecial.Tools.ECP.ECPCreate
                 {
                     var action = new ECPCreateAction(uiDocument);
                     action.Execute();
-                    //var fa = uiDocument.Selection.PickElement(document) as FamilyInstance;
-                    //if (fa == null)
-                    //    throw new Exception();
-                    //var solid = fa.GetSolid();
                     tsg.Assimilate();
                 }
                 catch (Autodesk.Revit.Exceptions.OperationCanceledException) { }

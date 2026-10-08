@@ -118,7 +118,6 @@ namespace DPSpecial.Utils
             {
                 result = p;
             }
-            //ddang sai
             return result;
         }
 
@@ -278,11 +277,6 @@ namespace DPSpecial.Utils
             double u = (p.X - rect.Left) / (double)(rect.Right - rect.Left);
             double v = (p.Y - rect.Top) / (double)(rect.Bottom - rect.Top);
             XYZ R = view.RightDirection, U = view.UpDirection;
-            double dx = (double)(p.X - rect.Left)
-              / (rect.Right - rect.Left);
-
-            double dy = (double)(p.Y - rect.Bottom)
-              / (rect.Top - rect.Bottom);
 
             IList<XYZ> corners = uiview.GetZoomCorners();
             XYZ a = corners[0];

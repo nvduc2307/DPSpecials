@@ -14,9 +14,6 @@ using System.Windows.Shapes;
 
 namespace DPSpecial.Tools.ECP.ECPZoneManageViews.view
 {
-    /// <summary>
-    /// Interaction logic for ECPZoneManageViewsView.xaml
-    /// </summary>
     public partial class ECPZoneManageViewsView : Window
     {
         public ECPZoneManageViewsView()

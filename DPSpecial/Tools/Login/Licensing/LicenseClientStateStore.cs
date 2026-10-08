@@ -6,9 +6,6 @@ using Newtonsoft.Json;
 
 namespace DPSpecial.Tools.Login.Licensing
 {
-    /// <summary>
-    ///     Lưu credential + lease của máy, mã hóa bằng Windows DPAPI (gắn với user Windows hiện tại).
-    /// </summary>
     internal static class LicenseClientStateStore
     {
         private static readonly byte[] Entropy =
@@ -87,7 +84,6 @@ namespace DPSpecial.Tools.Login.Licensing
             }
             catch
             {
-                // Lần xác nhận sau sẽ tự kích hoạt lại.
             }
         }
     }

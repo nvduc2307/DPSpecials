@@ -122,7 +122,6 @@ namespace DPSpecial.Tools.ECP.ECPCreate.action
                 : -dir.AngleTo(XYZ.BasisX);
             using (var ts = new Transaction(_document, "new transaction"))
             {
-                //ts.SkipAllWarnings();
                 ts.Start();
                 if (!_viewModel.ECPFamily.Symbol.IsActive)
                     _viewModel.ECPFamily.Symbol.Activate();
@@ -176,20 +175,16 @@ namespace DPSpecial.Tools.ECP.ECPCreate.action
             var r3 = p2 + nor * _viewModel.ECPThickness.FromMillimeters() / 2;
             var r4 = p2 - nor * _viewModel.ECPThickness.FromMillimeters() / 2;
 
-            Line l1 = null;
-            Line l2 = null;
-            Line l3 = null;
-            Line l4 = null;
 
             if (r1.DistanceTo(r2).ToMillimeters() < 50) return;
             if (r2.DistanceTo(r3).ToMillimeters() < 50) return;
             if (r3.DistanceTo(r4).ToMillimeters() < 50) return;
             if (r4.DistanceTo(r1).ToMillimeters() < 50) return;
 
-            l1 = Line.CreateBound(r1, r2);
-            l2 = Line.CreateBound(r2, r3);
-            l3 = Line.CreateBound(r3, r4);
-            l4 = Line.CreateBound(r4, r1);
+            var l1 = Line.CreateBound(r1, r2);
+            var l2 = Line.CreateBound(r2, r3);
+            var l3 = Line.CreateBound(r3, r4);
+            var l4 = Line.CreateBound(r4, r1);
             var ls = new List<Line>()
             {
                 l1,

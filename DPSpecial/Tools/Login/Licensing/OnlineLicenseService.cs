@@ -19,8 +19,6 @@ namespace DPSpecial.Tools.Login.Licensing
                     }
                     catch
                     {
-                        // A protected command will retry and show a generic
-                        // availability message if confirmation still fails.
                     }
                 });
         }

@@ -424,7 +424,6 @@ function normalizePrivateKey_(value) {
     return text;
   }
 
-  // Script Properties có thể làm mất ký tự xuống dòng: dựng lại PEM chuẩn.
   const body = match[1].replace(/\s+/g, '');
   const lines = body.match(/.{1,64}/g) || [];
   return '-----BEGIN PRIVATE KEY-----\n' +

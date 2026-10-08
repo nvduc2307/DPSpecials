@@ -15,19 +15,12 @@ using DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model;
 
 namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
 {
-    // Writes the オーダー票[メース一般] order slip as an A4 PDF (one or more pages).
-    // Each page is drawn with WPF in a 1414 x 2000 design space (the layout of the reference PDF) and the recorded
-    // drawing is then converted to PDF vector operators: lines and fills as paths, text as glyph outlines. That keeps
-    // everything sharp at any zoom and needs no font embedding, so Japanese text looks the same on every machine.
-    // A zone with more rows than fit on one page continues on the next page, repeating the header block and table
-    // header; the 合計 row is printed after the last row only.
     public static class ECPOrderSlipPdfExporter
     {
         private const double PageW = 1414, PageH = 2000;
         private const double PdfW = 595.28, PdfH = 841.89;
-        private const double FlattenTolerance = 0.02; // design units
+        private const double FlattenTolerance = 0.02;
 
-        // Table geometry (design units)
         private const double TableTop = 667, HeaderH = 68, RowH = 47.4, TotalGap = 5, TableBottomLimit = 1915;
         private static readonly double[] ColX = { 68, 100, 161, 363, 417, 472, 586, 639, 681, 734, 808, 896, 963, 1051, 1118, 1206, 1273, 1307 };
         private static readonly int RowsPerPage = (int)((TableBottomLimit - (TableTop + HeaderH) - TotalGap - RowH) / RowH);
@@ -37,7 +30,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
         private static readonly FontFamily Font = new("MS PGothic, MS Gothic, Meiryo, Yu Gothic, Segoe UI");
         private static readonly FontFamily NumFont = new("MS Gothic, Consolas, Courier New");
 
-        // One order slip (header + its rows).
         public class Slip
         {
             public ECPOrderDetailHeaderModel Header { get; set; }
@@ -47,7 +39,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
         public static void Export(ECPOrderDetailHeaderModel header, IReadOnlyList<ECPOrderDetailRowModel> rows, string path) =>
             Export(new[] { new Slip { Header = header, Rows = rows } }, path);
 
-        // Several slips are written one after another into a single PDF; each starts on a new page.
         public static void Export(IReadOnlyList<Slip> slips, string path)
         {
             var stamp = DateTime.Now;
@@ -66,7 +57,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
 
         #region Page drawing
 
-        // Returns the page's PDF content stream (vector operators).
         private static byte[] RenderPage(ECPOrderDetailHeaderModel h, IReadOnlyList<ECPOrderDetailRowModel> allRows,
             List<ECPOrderDetailRowModel> pageRows, bool isLast, DateTime stamp)
         {
@@ -106,7 +96,7 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
         private static void EmitGeometry(Geometry geometry, Brush fill, Pen stroke, Matrix m, StringBuilder sb)
         {
             var fillColor = (fill as SolidColorBrush)?.Color;
-            if (fillColor is { A: 0 }) fillColor = null; // fully transparent: nothing to paint
+            if (fillColor is { A: 0 }) fillColor = null;
             var strokeColor = stroke != null && stroke.Thickness > 0 ? (stroke.Brush as SolidColorBrush)?.Color : null;
             if (fillColor == null && strokeColor == null) return;
 
@@ -142,7 +132,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
 
         private static string Rgb(Color c) => $"{Num(c.R / 255.0)} {Num(c.G / 255.0)} {Num(c.B / 255.0)}";
 
-        // Design space (y down) -> PDF space (y up, points).
         private static string Pt(Matrix m, Point p)
         {
             var t = m.Transform(p);
@@ -165,59 +154,45 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
         private static void DrawHeaderBlock(DrawingContext dc, ECPOrderDetailHeaderModel h)
         {
             const double lx = 68, lw = 168;
-            double Y(int r) => 89 + r * 27; // row top, 27 units per row
+            double Y(int r) => 89 + r * 27;
 
-            // r0
             Label(dc, "■物件登録No.", lx, Y(0), lw); Value(dc, h.PropertyRegNo, 242, Y(0));
             Label(dc, "■受注No.", 344, Y(0), 100); Value(dc, h.OrderNo, 451, Y(0));
             Label(dc, "■進捗状況", 903, Y(0), 188); Value(dc, h.Status, 1098, Y(0));
-            // r1
             Label(dc, "■営業担当", lx, Y(1), lw);
             Value(dc, h.BranchOffice, 242, Y(1)); Value(dc, h.BranchOffice, 445, Y(1));
             Value(dc, string.IsNullOrEmpty(h.SalesStaffName) ? "" : "・担当  " + h.SalesStaffName, 650, Y(1));
-            // r2
             Label(dc, "■希望納期", lx, Y(2), lw); Value(dc, h.DesiredDate, 242, Y(2));
             Label(dc, "■現場到着予定日", 480, Y(2), 166); Value(dc, h.SiteArrivalDate, 653, Y(2));
             Label(dc, "■二次加工出荷予定日", 903, Y(2), 188); Value(dc, h.SecondaryShipDate, 1098, Y(2));
-            // r3
             Label(dc, "■工場出荷予定日", lx, Y(3), lw); Value(dc, h.FactoryShipDate, 242, Y(3));
             Label(dc, "■加工開始予定日", 480, Y(3), 166); Value(dc, h.ProcessStartDate, 653, Y(3));
             Label(dc, "■二次加工到着予定日", 903, Y(3), 188); Value(dc, h.SecondaryArrivalDate, 1098, Y(3));
-            // r4-r5
             Label(dc, "■物件名称", lx, Y(4), lw); Value(dc, h.PropertyName, 242, Y(4), 19.5);
             Label(dc, "■物件詳細", lx, Y(5), lw); Value(dc, h.PropertyDetail, 242, Y(5), 19.5);
-            // r6
             Label(dc, "■住所", lx, Y(6), lw);
             Value(dc, string.IsNullOrEmpty(h.PostalCode) ? "" : "〒  " + h.PostalCode, 242, Y(6));
             Value(dc, h.PrefectureName + h.Address, 371, Y(6));
             Label(dc, "■フロア", 1220, Y(6), 80); Value(dc, h.Floor, 1306, Y(6));
-            // r7
             Label(dc, "■施主", 424, Y(7), 88); Value(dc, h.OwnerName, 519, Y(7));
             Label(dc, "■設計", 829, Y(7), 80); Value(dc, h.DesignName, 917, Y(7));
-            // r8-r9
             Label(dc, "■元請", lx, Y(8), lw); Value(dc, h.ContractorName, 242, Y(8));
             Label(dc, "■工事店", 829, Y(8), 80); Value(dc, h.ConstructionShopName, 917, Y(8));
             Label(dc, "■荷受人", lx, Y(9), lw); Value(dc, h.Consignee, 242, Y(9));
             Label(dc, "■連絡先", 829, Y(9), 80); Value(dc, h.ContactPhone, 917, Y(9));
-            // r10
             Label(dc, "■用途", lx, Y(10), lw); Value(dc, h.UseName, 242, Y(10));
             Label(dc, "■出荷工場", 518, Y(10), 115); Value(dc, h.FactoryName, 640, Y(10));
             Label(dc, "■区分", 829, Y(10), 114); Value(dc, h.CategoryName, 951, Y(10));
-            // r11
             Label(dc, "■表裏", lx, Y(11), lw); Value(dc, h.FaceName, 242, Y(11));
             Label(dc, "■ｶﾞｽｹｯﾄ貼り", 518, Y(11), 115); Value(dc, h.GasketOn ? "有" : "無", 642, Y(11));
             Label(dc, "■ﾋﾞﾆｰﾙ梱包", 681, Y(11), 115); Value(dc, h.VinylOn ? "有" : "無", 804, Y(11));
-            // r12
             Label(dc, "■仕様", lx, Y(12), lw); Value(dc, h.SpecName, 242, Y(12));
             Label(dc, "■種類", 829, Y(12), 114); Value(dc, h.PaintTypeName, 951, Y(12));
-            // r13
             Label(dc, "■色番号", lx, Y(13), lw); Value(dc, h.ColorNo, 242, Y(13));
             Label(dc, "■艶", 518, Y(13), 115); Value(dc, h.GlossName, 640, Y(13));
             Label(dc, "■ｻﾝﾌﾟﾙNo.", 829, Y(13), 114); Value(dc, h.SampleNo, 951, Y(13));
-            // r14
             Label(dc, "■お客様備考", lx, Y(14), lw); Value(dc, h.CustomerNote, 242, Y(14));
 
-            // lower block (gap above)
             double Y2(int r) => 519 + r * 27;
             Label(dc, "■受渡方法", lx, Y2(0), lw); Value(dc, h.DeliveryMethodName, 242, Y2(0));
             Label(dc, "■車両車種", 518, Y2(0), 115); Value(dc, h.VehicleName, 640, Y2(0)); Value(dc, h.VehicleTypeName, 735, Y2(0));
@@ -238,7 +213,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
             var bodyBottom = bodyTop + pageRows.Count * RowH;
             var right = ColX[ColX.Length - 1];
 
-            // header cells
             dc.DrawRectangle(LabelFill, null, new Rect(ColX[0], TableTop, right - ColX[0], HeaderH));
             string[] heads = { "No.", "施工図", "製品番号", "長さ", "数量", "縦切図", "寸法", "ﾘﾌﾞ", "角度", "加工ｺｰﾄﾞ" };
             for (var i = 0; i < heads.Length; i++)
@@ -255,7 +229,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
             for (var i = 0; i < 6; i++)
                 Text(dc, subs[i], (ColX[10 + i] + ColX[11 + i]) / 2, TableTop + 40, 15.5, align: TextAlignment.Center);
 
-            // body rows
             for (var r = 0; r < pageRows.Count; r++)
             {
                 var row = pageRows[r];
@@ -277,17 +250,14 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
                 dc.DrawLine(pen, new Point(ColX[0], top + RowH), new Point(right, top + RowH));
             }
 
-            // vertical lines + outer frame
             for (var i = 0; i < ColX.Length; i++)
             {
-                // the split between 面積 and 重量 only starts below the 基材/働き/役物 group header
                 var isSubSplit = i is 11 or 13 or 15;
                 dc.DrawLine(pen, new Point(ColX[i], isSubSplit ? TableTop + 34 : TableTop), new Point(ColX[i], bodyBottom));
             }
             dc.DrawLine(pen, new Point(ColX[0], bodyTop), new Point(right, bodyTop));
             dc.DrawRectangle(null, thick, new Rect(ColX[0], TableTop, right - ColX[0], bodyBottom - TableTop));
 
-            // 合計 row (last page only)
             if (!isLast) return;
             var tTop = bodyBottom + TotalGap;
             dc.DrawRectangle(LabelFill, null, new Rect(ColX[0], tTop, ColX[4] - ColX[0], RowH));
@@ -308,7 +278,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
                 Text(dc, totals[i], ColX[11 + i] - 8, tTop + 14, 14.5, align: TextAlignment.Right, font: NumFont);
         }
 
-        // 縦切図: the row's SVG drawing (80 x 28 canvas), scaled to fit the 114-unit-wide cell.
         private static void DrawShape(DrawingContext dc, ECPOrderDetailRowModel row, double cellX, double rowTop)
         {
             const double scale = 1.38;
@@ -356,7 +325,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
         private static int ParseInt(string s) =>
             int.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var v) ? v : 0;
 
-        // Sum of the numeric strings (thousand separators ignored); empty when nothing was parsed.
         private static string SumText(IEnumerable<string> values, int decimals)
         {
             var any = false;
@@ -384,7 +352,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
             void Write(string s) { var b = Encoding.ASCII.GetBytes(s); fs.Write(b, 0, b.Length); }
             void Begin(int id) { offsets.Add(fs.Position); Write($"{id} 0 obj\n"); }
 
-            // object ids: 1 catalog, 2 pages, then per page: page, content
             Write("%PDF-1.4\n");
             Begin(1); Write("<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
             var kids = string.Join(" ", Enumerable.Range(0, contents.Count).Select(i => $"{3 + i * 2} 0 R"));
@@ -409,7 +376,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
             Write($"trailer\n<< /Size {offsets.Count + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n");
         }
 
-        // zlib container (header + raw deflate + Adler-32), as required by PDF's FlateDecode.
         private static byte[] Deflate(byte[] data)
         {
             using var ms = new MemoryStream();

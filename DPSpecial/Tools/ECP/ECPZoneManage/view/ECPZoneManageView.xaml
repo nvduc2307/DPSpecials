@@ -71,7 +71,6 @@
                 <DataGridTemplateColumn Header="Color" Width="60" IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <!-- Bind through the DataGrid's own DataContext (the VM) since the row's DataContext is the zone itself. -->
                             <Button BorderThickness="1"
                                     Height="22"
                                     Width="40"

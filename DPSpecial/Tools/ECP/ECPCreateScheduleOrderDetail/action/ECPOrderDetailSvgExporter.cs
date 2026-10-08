@@ -4,16 +4,12 @@ using DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model;
 
 namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
 {
-    // Writes the 縦切図 shapes of the detail grid as SVG files named after the type (製品番号).
-    // The geometry mirrors the shapes drawn in ECPCreateScheduleOrderDetailView.xaml (80 x 28 canvas).
     public static class ECPOrderDetailSvgExporter
     {
-        // Shared with ECPOrderSlipPdfExporter so the PDF draws the same shapes.
         public const string OutlineDoubleTongue = "M3,7 L12,7 L12,2 L66,2 L66,7 L77,7 L77,21 L66,21 L66,26 L12,26 L12,21 L3,21 Z";
         public const string OutlineTongueGroove = "M3,7 L12,7 L12,2 L77,2 L77,8 L68,8 L68,20 L77,20 L77,26 L12,26 L12,21 L3,21 Z";
         public const string BlockDoubleTongue = "M54,3 L66,3 L66,8 L76,8 L76,20 L66,20 L66,25 L54,25 Z";
         public const string BlockTongueGroove = "M54,3 L76,3 L76,8 L69,8 L69,20 L76,20 L76,25 L54,25 Z";
-        // Corner panel (MNY…): slanted left end, groove on the right end.
         public const string OutlineCorner = "M17,2 L77,2 L77,8 L68,8 L68,20 L77,20 L77,26 L3,26 Z";
         public const string BlockCorner = "M47,3 L76,3 L76,8 L69,8 L69,20 L76,20 L76,25 L47,25 Z";
 
@@ -23,25 +19,17 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
         public static string BlockOf(string profile) =>
             profile == "Corner" ? BlockCorner : profile == "DoubleTongue" ? BlockDoubleTongue : BlockTongueGroove;
 
-        // Left end of the red line along the top edge of a RightBlock shape.
         public static double RedLineStartX(string profile) => profile == "Corner" ? 17 : 12;
-        // Left edge of the black block (corner panels get a dotted white edge there).
         public const double CornerBlockX = 47;
 
-        // Left edge of the black block per profile, and whether its edge gets the dotted white line.
         public static double BlockLeftX(string profile) => profile == "Corner" ? CornerBlockX : 54;
         public static bool BlockHasDottedEdge(string profile) => profile != "DoubleTongue";
-        // FlatCut: the left tongue is filled black and the body edge is dotted (x = 12).
         public const double FlatCutEdgeX = 12;
 
-        // Returns the files written. One file per distinct type + shape kind; when a type appears with
-        // several shape kinds, the non-normal kinds get a "_<kind>" suffix so nothing is overwritten.
         public static List<string> Export(IEnumerable<ECPOrderDetailRowModel> rows, string folder)
         {
             Directory.CreateDirectory(folder);
             var written = new List<string>();
-            // One file per distinct type + drawing; when a type has several drawings the extra ones get a
-            // "_<label>" suffix (the wall image name, or the shape kind) so nothing is overwritten.
             var items = rows
                 .Where(x => !string.IsNullOrWhiteSpace(x.PartNumber))
                 .Select(x => (Type: x.PartNumber.Trim(),
@@ -61,8 +49,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
             return written;
         }
 
-        // The SVG of a row: the named wall image (imgs<ImageName>.svg) when it has one, otherwise the shape
-        // built from its ShapeKind / Profile.
         public static string GetSvg(ECPOrderDetailRowModel row) =>
             SvgDrawing.LoadEmbedded(row.ImageName) ?? BuildSvg(string.IsNullOrEmpty(row.ShapeKind) ? "Normal" : row.ShapeKind, row.Profile);
 

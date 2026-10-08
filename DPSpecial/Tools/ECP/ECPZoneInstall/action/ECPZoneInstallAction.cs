@@ -60,8 +60,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
             _view.ShowDialog();
         }
 
-        // Zones themselves are defined/edited via ECPZoneManageCmd and persisted with the same schema;
-        // this command only reads that list to let the user pick one to apply.
         private List<ECPZoneSaveModel> GetZones(ECPZoneSchema zoneSchema)
         {
             var content = zoneSchema.Read(_document.ProjectInformation);
@@ -69,8 +67,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
             return JsonConvert.DeserializeObject<List<ECPZoneSaveModel>>(content) ?? new List<ECPZoneSaveModel>();
         }
 
-        // Keeps prompting for one ECP element at a time (like ECPCreateAction/ECPModifyWidthAction's
-        // pick loops) until the user presses Esc, tagging each picked element with the chosen zone.
         private void _Ok()
         {
             var zone = _viewModel.Zone;
@@ -85,8 +81,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
             var view = _document.ActiveView;
             var patternId = GetDiagonalCrosshatchPatternId();
 
-            // One transaction per pick so the overrides apply as soon as the selection is finished,
-            // instead of waiting for the user to press Esc.
             var isDo = true;
             do
             {
@@ -151,12 +145,11 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
             {
                 element.LookupParameter(WallParameterName.ZONE).Set(zone);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         }
 
-        // Tints the element in the active view so the assigned zone is visible at a glance.
         private void TintElement(Autodesk.Revit.DB.View view, Element element, Color color, ElementId patternId)
         {
             var overrides = new OverrideGraphicSettings();
@@ -171,7 +164,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
             view.SetElementOverrides(element.Id, overrides);
         }
 
-        // "Diagonal crosshatch" fill pattern used for the surface foreground override.
         private ElementId GetDiagonalCrosshatchPatternId()
         {
             var patterns = new FilteredElementCollector(_document)
@@ -186,7 +178,7 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
         private Color ParseColor(string hex)
         {
             hex = (hex ?? string.Empty).TrimStart('#');
-            if (hex.Length != 6) return new Color(109, 195, 187); // fallback: default zone color
+            if (hex.Length != 6) return new Color(109, 195, 187);
             var r = Convert.ToByte(hex.Substring(0, 2), 16);
             var g = Convert.ToByte(hex.Substring(2, 2), 16);
             var b = Convert.ToByte(hex.Substring(4, 2), 16);

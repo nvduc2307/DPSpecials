@@ -53,7 +53,6 @@ namespace DPSpecial.Tools.Login.Licensing
             }
             catch
             {
-                // Bên gọi báo lỗi cấu hình.
             }
 
             return new LicenseServerConfiguration();

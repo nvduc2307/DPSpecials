@@ -2,10 +2,6 @@ using System.IO;
 
 namespace DPSpecial.Utils
 {
-    /// <summary>
-    ///     Ghi mốc thời gian vào %LocalAppData%\DPSpecial\perf.log để tìm đoạn chậm.
-    ///     Mọi lỗi ghi file đều bị bỏ qua, không ảnh hưởng lệnh.
-    /// </summary>
     public static class PerfLog
     {
         private static readonly object Sync = new object();

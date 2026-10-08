@@ -28,14 +28,12 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
 
         public void Execute()
         {
-            // 1. Read the current zone definitions from ProjectInformation (source of truth).
             var zones = GetZones();
             if (!zones.Any())
                 throw new Exception("No zones have been defined yet. Run \"ECP Zone Manage\" first.");
 
             var zoneLookup = zones.ToDictionary(z => z.Id);
 
-            // 2. Collect all ECP FamilyInstances in the document.
             var ecpElements = new FilteredElementCollector(_document)
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(FamilyInstance))
@@ -46,12 +44,10 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
             if (!ecpElements.Any())
                 throw new Exception("No ECP elements found in the document.");
 
-            // 3. Scan each element, compare assigned zone vs current zone definition.
             var updatedCount = 0;
             var removedCount = 0;
             var headerCount = 0;
             var view = _document.ActiveView;
-            // Overrides are only (re)applied in the zone-setting view, using the same pattern as Install Zone.
             var isSettingView = view.Name.Contains(ECPZoneDimensionHelper.NameViewSettingZone);
             var patternId = isSettingView ? GetDiagonalCrosshatchPatternId() : ElementId.InvalidElementId;
 
@@ -63,16 +59,14 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
                 {
                     var assignedJson = _assignSchema.Read(element);
                     if (string.IsNullOrEmpty(assignedJson))
-                        continue; // Element has no zone assigned — skip.
+                        continue;
 
                     var assignedZone = JsonConvert.DeserializeObject<ECPZoneSaveModel>(assignedJson);
                     if (assignedZone == null)
                         continue;
 
-                    // Look up the current zone definition by Id.
                     if (!zoneLookup.TryGetValue(assignedZone.Id, out var currentZone))
                     {
-                        // Zone was deleted from the zone list — remove assignment from element.
                         _assignSchema.Write(element, string.Empty);
                         if (isSettingView)
                             ClearElementOverrides(view, element);
@@ -81,33 +75,28 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
                         continue;
                     }
 
-                    // Compare each field: Name, OrderNo, PropertyRegNo, Color.
                     if (assignedZone.Name == currentZone.Name
                         && assignedZone.OrderNo == currentZone.OrderNo
                         && assignedZone.PropertyRegNo == currentZone.PropertyRegNo
                         && assignedZone.Color == currentZone.Color)
                     {
-                        continue; // No changes — skip.
+                        continue;
                     }
 
-                    // Zone definition has changed — update the per-element entity.
                     var updatedJson = JsonConvert.SerializeObject(currentZone);
                     _assignSchema.Write(element, updatedJson);
 
-                    // Refresh the color overlay to match the (possibly new) zone color.
                     if (isSettingView)
                         TintElement(view, element, ParseColor(currentZone.Color), patternId);
                     WriteParameterElement(element, currentZone.Name);
                     updatedCount++;
                 }
 
-                // Saved order-detail headers are referenced by zone id: refresh their zone-derived values too.
                 headerCount = ECPOrderDetailHeaderStore.SyncWithZones(_document, zones);
 
                 ts.Commit();
             }
 
-            // 4. Report results.
             var messages = new List<string>();
             if (updatedCount > 0)
                 messages.Add($"Updated: {updatedCount} element(s).");
@@ -121,11 +110,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
             IO.ShowInfo(string.Join("\n", messages));
         }
 
-        /// <summary>
-        /// Checks whether any ECP element in the model has a stale zone assignment.
-        /// Returns true if at least one element's zone (Name, Number, Code, or Color)
-        /// differs from the current zone definitions, or its zone was deleted.
-        /// </summary>
 
         private List<ECPZoneSaveModel> GetZones()
         {
@@ -148,7 +132,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
             view.SetElementOverrides(element.Id, overrides);
         }
 
-        // "Diagonal crosshatch" fill pattern used for the surface foreground override.
         private ElementId GetDiagonalCrosshatchPatternId()
         {
             var patterns = new FilteredElementCollector(_document)
@@ -208,11 +191,9 @@ namespace DPSpecial.Tools.ECP.ECPZoneUpdate.action
                 if (assignedZone == null)
                     continue;
 
-                // Zone was deleted → changed.
                 if (!zoneLookup.TryGetValue(assignedZone.Id, out var currentZone))
                     return true;
 
-                // Any field differs → changed.
                 if (assignedZone.Name != currentZone.Name
                     || assignedZone.OrderNo != currentZone.OrderNo
                     || assignedZone.PropertyRegNo != currentZone.PropertyRegNo

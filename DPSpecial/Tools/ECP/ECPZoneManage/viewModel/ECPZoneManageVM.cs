@@ -7,7 +7,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneManage.viewModel
     {
         public ObservableCollection<ECPZoneModel> Zones { get; set; } = new();
 
-        // Set from the view's Loaded event so DeleteZone can read the currently selected row.
         public System.Windows.Controls.DataGrid ZoneDataGrid { get; set; }
 
         public RelayCommand<ECPZoneModel> PickColorCommand { get; set; }

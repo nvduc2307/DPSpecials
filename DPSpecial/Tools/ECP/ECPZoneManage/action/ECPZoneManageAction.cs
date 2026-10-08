@@ -45,8 +45,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneManage.action
             _view.ShowDialog();
         }
 
-        // Zones are persisted as JSON on ProjectInformation via Extensible Storage (DPSpecial.Cores.SchemaEntityBase),
-        // the same pattern ECPShapeAction uses for per-element data.
         private List<ECPZoneModel> GetZones()
         {
             var result = new List<ECPZoneModel>();
@@ -65,8 +63,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneManage.action
                 zone.ChangeNameAction = _ChangeNameAction;
         }
 
-        // Blocks duplicate zone names: if the new name collides with another zone, warn and drop the last
-        // typed character (mirrors DPTools.BricsR.BricsRZones.ManageZones' ManageZonesVM._changeNameAction).
         private void _ChangeNameAction(ECPZoneModel zone)
         {
             var duplicated = _viewModel.Zones.FirstOrDefault(x => x.Name == zone.Name && x.Id != zone.Id);
@@ -74,7 +70,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneManage.action
 
             IO.ShowWarning("Zone name already exists.\nTên zone đã tồn tại.");
 
-            // Temporarily detach the callback so the corrective assignment below doesn't re-enter this method.
             zone.ChangeNameAction = null;
             zone.Name = zone.Name.Length > 0 ? zone.Name.Substring(0, zone.Name.Length - 1) : zone.Name;
             zone.ChangeNameAction = _ChangeNameAction;
@@ -108,7 +103,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneManage.action
 
         private void _Ok()
         {
-            // --- Validation: empty fields ---
             var errors = new List<string>();
 
             var emptyNumber = _viewModel.Zones.Any(z => string.IsNullOrWhiteSpace(z.OrderNo));
@@ -119,7 +113,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneManage.action
             if (emptyCode) errors.Add("- PropertyRegNo không được để trống.");
             if (emptyName) errors.Add("- Name không được để trống.");
 
-            // --- Validation: duplicate fields ---
             var dupNumbers = _viewModel.Zones
                 .Where(z => !string.IsNullOrWhiteSpace(z.OrderNo))
                 .GroupBy(z => z.OrderNo.Trim())

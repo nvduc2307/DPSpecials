@@ -18,9 +18,6 @@ using Nice3point.Revit.Toolkit.External;
 
 namespace DPSpecial
 {
-    /// <summary>
-    ///     Application entry point
-    /// </summary>
     public class Application : ExternalApplication
     {
         public override void OnStartup()

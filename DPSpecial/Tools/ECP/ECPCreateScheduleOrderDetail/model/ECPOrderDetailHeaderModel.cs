@@ -3,12 +3,10 @@ using Newtonsoft.Json;
 
 namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
 {
-    // 販売店受注修正 header data (everything above the detail grid and in the footer totals).
     public class ECPOrderDetailHeaderModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        // Each yes/no radio pair shares one bool; both radios bind two-way so either can be clicked.
         private void SetPair(ref bool field, bool value, string on, string off)
         {
             if (field == value) return;
@@ -17,20 +15,17 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(off));
         }
 
-        // 物件登録No / 受注No / 営業担当者 / 進捗状況
         public string PropertyRegNo { get; set; } = string.Empty;
         public string OrderNo { get; set; } = string.Empty;
         public string SalesStaffCode { get; set; } = string.Empty;
         public string SalesStaffName { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
 
-        // お客様情報
         public string DealerCode { get; set; } = string.Empty;
         public string DealerName { get; set; } = string.Empty;
         public string DealerBranch { get; set; } = string.Empty;
         public string DealerContact { get; set; } = string.Empty;
 
-        // 物件情報
         public string PropertyName { get; set; } = string.Empty;
         public string PropertyDetail { get; set; } = string.Empty;
         public string PostalCode { get; set; } = string.Empty;
@@ -47,10 +42,8 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
         public string Consignee { get; set; } = string.Empty;
         public string ContactPhone { get; set; } = string.Empty;
 
-        // 備考
         public string CustomerNote { get; set; } = string.Empty;
 
-        // 基材情報
         public string UseCode { get; set; } = string.Empty;
         public string UseName { get; set; } = string.Empty;
         public string FactoryCode { get; set; } = string.Empty;
@@ -68,7 +61,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
         public string HardwareCode { get; set; } = string.Empty;
         public string HardwareName { get; set; } = string.Empty;
 
-        // 仕上げ情報
         public string SpecCode { get; set; } = string.Empty;
         public string SpecName { get; set; } = string.Empty;
         public string PaintTypeCode { get; set; } = string.Empty;
@@ -78,10 +70,8 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
         public string GlossName { get; set; } = string.Empty;
         public string SampleNo { get; set; } = string.Empty;
 
-        // 希望納期
         public string DesiredDate { get; set; } = string.Empty;
 
-        // Order slip PDF only: 営業担当 支店 / 現場到着予定日 / 工場出荷予定日 / 加工開始予定日 / 二次加工出荷・到着予定日 / フロア
         public string BranchOffice { get; set; } = string.Empty;
         public string SiteArrivalDate { get; set; } = string.Empty;
         public string FactoryShipDate { get; set; } = string.Empty;
@@ -90,7 +80,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
         public string SecondaryArrivalDate { get; set; } = string.Empty;
         public string Floor { get; set; } = string.Empty;
 
-        // 配車情報
         public string DeliveryMethodCode { get; set; } = string.Empty;
         public string DeliveryMethodName { get; set; } = string.Empty;
         public string VehicleCode { get; set; } = string.Empty;
@@ -103,10 +92,8 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.model
         public bool MapOn { get => _mapOn; set => SetPair(ref _mapOn, value, nameof(MapOn), nameof(MapOff)); }
         [JsonIgnore] public bool MapOff { get => !_mapOn; set => MapOn = !value; }
 
-        // 断面図イメージ
         public string ConstructionDrawingNo { get; set; } = string.Empty;
 
-        // Footer totals: 実枚 / 換枚 / 基材面積 / 基材重量 / 働き面積 / 働き重量 / 長さ
         public string ActualCount { get; set; } = string.Empty;
         public string ExchangeCount { get; set; } = string.Empty;
         public string BaseArea { get; set; } = string.Empty;

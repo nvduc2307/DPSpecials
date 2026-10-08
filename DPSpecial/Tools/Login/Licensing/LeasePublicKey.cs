@@ -5,9 +5,6 @@ namespace DPSpecial.Tools.Login.Licensing
 {
     internal static class LeasePublicKey
     {
-        // Public key RSA-2048 dùng xác thực chữ ký lease do license server cấp.
-        // Private key chỉ nằm trên server (license-server/LicenseServer/keys/private.pem).
-        // Xem lại bằng: dotnet run -- init (trong license-server/LicenseServer).
         private const string ModulusBase64 =
             "qcGx2HZwoZX6A7l5e2ClmPQzWS/nF10xe0QJKyXBP5YLI03FuF8b+YLdgGgdJcx8" +
             "WK9JbwEDVY+HRJxTet6upPL191BiIe7WqME52/NmOgx369uvfeJTO/slavU1dwLg" +

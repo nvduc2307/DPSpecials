@@ -4,7 +4,6 @@ using DPSpecial.Utils;
 
 namespace DPSpecial.Tools.ECP.ECPZoneDimensionUpdate.action
 {
-    // Lets the user pick ECP walls in the zone-setting view and puts their shape/width/height notes back in place.
     public class ECPZoneDimensionUpdateAction
     {
         private readonly UIDocument _uidocument;

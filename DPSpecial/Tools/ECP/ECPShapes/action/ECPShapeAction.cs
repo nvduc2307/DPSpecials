@@ -13,13 +13,9 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
         private UIDocument _uidocument;
         private Document _document;
         private ECPShapeSchema _eCPShapeSchemal;
-        // Quá thời gian này thì dừng xử lý, commit phần đã làm và kết thúc.
-        private const int TimeoutSeconds = 120;
-        // Template chỉ mở 1 lần cho cả lần chạy, mỗi hình chỉ nạp 1 lần rồi dùng lại cho mọi tường.
         private Document _templateDoc;
         private readonly List<ElementId> _loadedShapeIds = new List<ElementId>();
         private readonly HashSet<string> _missingShapes = new HashSet<string>();
-        // Nhóm hình gốc đã tìm/nạp theo tên, tránh quét lại toàn bộ Group trong project cho từng tường.
         private readonly Dictionary<string, Group> _shapeCache = new Dictionary<string, Group>();
         public ECPShapeAction(UIDocument uidocument)
         {
@@ -87,8 +83,6 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
                         if (idShapeOld == null) continue;
                         try
                         {
-                            // Không Regenerate ở đây: mỗi lần buộc Revit dựng lại cả view Elevation,
-                            // Revit tự cập nhật một lần khi commit.
                             _document.Delete(idShapeOld);
                         }
                         catch (Exception)
@@ -107,7 +101,6 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
                 PerfLog.Write($"ECPShape: Commit xong, {stopwatch.ElapsedMilliseconds} ms");
             }
         }
-        // Xoá các nhóm hình vừa nạp từ template (đã copy xong cho từng tường).
         private void DeleteLoadedShapes()
         {
             foreach (var id in _loadedShapeIds)
@@ -210,8 +203,6 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
         {
             if (string.IsNullOrEmpty(shapeECPName)) return null;
             if (_shapeCache.TryGetValue(shapeECPName, out var cached) && cached.IsValidObject) return cached;
-            // Hình đã nạp ở tường trước vẫn còn trong project nên được tìm thấy ở đây,
-            // không phải mở lại template cho từng tường.
             var group = FindDetailGroupInstance(_document, shapeECPName);
             if (group != null)
             {

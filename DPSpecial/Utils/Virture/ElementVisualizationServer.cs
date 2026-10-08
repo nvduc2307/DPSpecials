@@ -14,7 +14,6 @@ namespace DPSpecial.Utils
         private List<RenderingBufferStorage> _faceBuffers;
         public List<RenderingBufferStorage> _edgeBuffers { get; set; }
         private double _transparency;
-        private double _scale;
         private Color _faceColor;
         private Color _edgeColor;
         private bool _drawFace;
@@ -172,7 +171,6 @@ namespace DPSpecial.Utils
             var uiDocument = _uiDocument;
             if (uiDocument is null) return;
 
-            _scale = value;
 
             lock (_renderLock)
             {

@@ -16,14 +16,10 @@ using Point = System.Windows.Point;
 
 namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
 {
-    // Turns the simple SVG shapes of the 縦切図 (path / line / rect / text on an 80 x 28 canvas) into a WPF drawing,
-    // so the same SVG is shown in the grid and printed in the PDF. The SVG files live in imgs\ and are embedded
-    // in the assembly (looked up by file name without extension).
     public static class SvgDrawing
     {
         public const double Width = 80, Height = 28;
 
-        // Text of the embedded imgs\<name>.svg, or null when there is no such image.
         public static string LoadEmbedded(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) return null;
@@ -63,7 +59,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
                 }
             }
 
-            // Fixes the drawing's bounds to the canvas so every image is scaled alike.
             group.Children.Insert(0, new GeometryDrawing(Brushes.Transparent, null, new RectangleGeometry(new Rect(0, 0, Width, Height))));
             return Freeze(group);
         }
@@ -92,7 +87,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
             var fill = ParseBrush((string)e.Attribute("fill") ?? "#000000") ?? Brushes.Black;
             var ft = new FormattedText(e.Value, CultureInfo.GetCultureInfo("ja-JP"), FlowDirection.LeftToRight,
                 new Typeface(family, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal), size, fill, 1.0);
-            // SVG y is the baseline; FormattedText is positioned by its top-left corner.
             var geometry = ft.BuildGeometry(new Point(Num(e, "x"), Num(e, "y") - ft.Baseline));
             group.Children.Add(new GeometryDrawing(fill, null, geometry));
         }

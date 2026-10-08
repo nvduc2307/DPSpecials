@@ -14,9 +14,6 @@ using System.Windows.Shapes;
 
 namespace DPSpecial.Tools.ECP.ECPCreate.view
 {
-    /// <summary>
-    /// Interaction logic for ECPCreateView.xaml
-    /// </summary>
     public partial class ECPCreateView : Window
     {
         public ECPCreateView()

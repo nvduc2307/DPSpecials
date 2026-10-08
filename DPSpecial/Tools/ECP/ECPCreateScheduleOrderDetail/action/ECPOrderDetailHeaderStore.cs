@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 
 namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
 {
-    // Reads/writes the per-zone headers stored on ProjectInformation (a JSON list keyed by zone id).
     public static class ECPOrderDetailHeaderStore
     {
         private static ECPOrderDetailHeaderSchema CreateSchema() =>
@@ -22,7 +21,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
         public static ECPOrderDetailHeaderModel Find(Document document, int zoneId) =>
             Load(document).FirstOrDefault(x => x.ZoneId == zoneId)?.Header;
 
-        // Inserts or replaces the header and rows of one zone (opens its own transaction).
         public static void Save(Document document, int zoneId, ECPOrderDetailHeaderModel header, IEnumerable<ECPOrderDetailRowModel> rows)
         {
             var all = Load(document);
@@ -49,7 +47,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
             ts.Commit();
         }
 
-        // Puts the saved user-entered values back onto freshly built rows (matched by Key).
         public static void ApplySavedRows(Document document, int zoneId, IEnumerable<ECPOrderDetailRowModel> rows)
         {
             var saved = Load(document).FirstOrDefault(x => x.ZoneId == zoneId)?.Rows;
@@ -68,9 +65,6 @@ namespace DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail.action
             }
         }
 
-        // Brings the saved headers in line with the current zone definitions: the zone-derived fields
-        // (物件登録No / 受注No / 物件詳細) are refreshed, and headers of deleted zones are dropped.
-        // Must be called inside an open transaction. Returns the number of headers changed or removed.
         public static int SyncWithZones(Document document, IReadOnlyCollection<ECPZoneSaveModel> zones)
         {
             var all = Load(document);

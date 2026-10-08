@@ -7,7 +7,6 @@ namespace DPSpecial.Tools.Login.Licensing
 {
     public static class MachineCodeProvider
     {
-        // Salt cố định: đổi giá trị này sẽ làm đổi mã máy của mọi thiết bị đã kích hoạt.
         private const string ProductSalt = "DPSpecial.DeviceHash.v1";
 
         public static string GetMachineCode()

@@ -29,7 +29,6 @@ namespace DPSpecial.Tools.ECP.ECPCreate.action
                 var p = new XYZ(transf.Origin.X, transf.Origin.Y, document.ActiveView.GenLevel.Elevation) 
                     - transf.BasisY * scale * _extent.FromMillimeters();
                 result = document.Create.NewDimension(document.ActiveView, Line.CreateUnbound(p, vtx), arr);
-                //Alight Dim
                 AlightTextDim(result, walls.FirstOrDefault().GetTransform().BasisX.CrossProduct(document.ActiveView.ViewDirection));
                 CreateDimIntersect(walls);
             }

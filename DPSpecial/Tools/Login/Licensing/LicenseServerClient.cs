@@ -7,10 +7,6 @@ using Newtonsoft.Json;
 
 namespace DPSpecial.Tools.Login.Licensing
 {
-    /// <summary>
-    ///     Gọi license server bằng HttpWebRequest (System.dll). Không dùng System.Net.Http để tránh
-    ///     xung đột phiên bản với bản đã được Revit nạp sẵn (R22-R24 chạy .NET Framework).
-    /// </summary>
     internal sealed class LicenseServerClient
     {
         private const int RequestTimeoutMilliseconds = 15000;
@@ -22,7 +18,6 @@ namespace DPSpecial.Tools.Login.Licensing
         static LicenseServerClient()
         {
 #if NETFRAMEWORK
-            // Google chỉ nhận TLS 1.2 trở lên; chỉ bổ sung, không bỏ giao thức nào.
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
 #endif
         }
@@ -74,7 +69,6 @@ namespace DPSpecial.Tools.Login.Licensing
                     {
                     }
 
-                    // Server trả JSON cho cả lỗi nghiệp vụ; chỉ lỗi hạ tầng mới thử lại.
                     if (serverResponse != null &&
                         !string.IsNullOrEmpty(serverResponse.Code) &&
                         status != 500)
@@ -166,7 +160,6 @@ namespace DPSpecial.Tools.Login.Licensing
                             return ReadBody(response);
                         }
 
-                        // Apps Script chuyển POST sang một URL GET chứa kết quả.
                         uri = next;
                         isPost = false;
                         continue;

@@ -4,8 +4,6 @@ using WallParam = DPSpecial.MVVM.Models.WallParameterName;
 
 namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
 {
-    // Creates / refreshes the shape, width and height notes of ECP elements in the active zone-setting view.
-    // Shared by Install Zone and the Update Dimension tools.
     public class ECPZoneDimensionHelper
     {
         public const string NameViewSettingZone = "_settingZone";
@@ -25,7 +23,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
             _dimensionSchema = new ECPZoneDimensionSchema(ECPZoneDimensionSchema.GUID, ECPZoneDimensionSchema.NAME);
         }
 
-        // The active view must be an elevation zone-setting view.
         public static void ValidateView(Document document)
         {
             var activeView = document.ActiveView;
@@ -41,7 +38,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
             return fa.Symbol.FamilyName.ToUpper().Contains("ECP");
         }
 
-        // A wall belongs to the view when its plane is parallel to the view plane.
         public static bool IsInViewPlane(Element element, Autodesk.Revit.DB.View view)
         {
             if (!IsECP(element)) return false;
@@ -60,7 +56,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
                 .ToList();
         }
 
-        // Creates (or fixes the size of) the text types used for the notes. Call inside a transaction.
         public void InitTextTypes()
         {
             var textTypes = new FilteredElementCollector(_document)
@@ -73,8 +68,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
             _shapeTextType = GetOrCreateTextType(textTypes, _shapeTextTypeName, _shapeTextHeight);
         }
 
-        // Replaces the element's notes in the active view so they sit at their default position without duplicates.
-        // Returns false when the element has no width/height parameter or no extent in the view.
         public bool Update(FamilyInstance element)
         {
             RemoveDimensions(element);
@@ -98,7 +91,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
             return name.StartsWith("ecp_", StringComparison.OrdinalIgnoreCase) ? name.Substring(4) : name;
         }
 
-        // Removes the notes of this element previously created in the active view.
         private void RemoveDimensions(FamilyInstance element)
         {
             var textNotes = new FilteredElementCollector(_document, _document.ActiveView.Id)
@@ -111,8 +103,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
                 _document.Delete(textNotes);
         }
 
-        // Writes the shape at the top, the width (幅) at the bottom and the height (長さ) rotated along the right edge of the element,
-        // both inside the element's extent in the active view.
         private bool ShowDimensions(FamilyInstance element)
         {
             if (_textType == null) return false;
@@ -156,7 +146,6 @@ namespace DPSpecial.Tools.ECP.ECPZoneInstall.action
                 Line.CreateUnbound(pTextHeight, view.ViewDirection),
                 Math.PI / 2);
 
-            // Shape name = type name without the "ECP_" prefix, written along the top edge.
             var shape = GetShapeName(element);
             if (!string.IsNullOrEmpty(shape))
             {
