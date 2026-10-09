@@ -5,7 +5,9 @@ const LEGACY_LICENSE_PRODUCT = 'DPSpecial';
 const LEASE_HOURS = 72;
 const DEFAULT_MAX_DEVICES = 1;
 const MAX_DEVICE_LIMIT = 100;
-const STORAGE_SCHEMA_VERSION = '2';
+const STORAGE_SCHEMA_VERSION = '3';
+const DISPLAY_TIME_ZONE = 'Asia/Ho_Chi_Minh';
+const DATE_FORMAT = 'yyyy-mm-dd hh:mm:ss';
 
 const LICENSE_HEADERS = [
   'LicenseId',
@@ -30,7 +32,8 @@ const ACTIVATION_HEADERS = [
   'ActivatedUtc',
   'LastCheckUtc',
   'RevokedUtc',
-  'Notes'
+  'Notes',
+  'MachineName'
 ];
 
 function doGet() {
@@ -70,6 +73,7 @@ function doPost(e) {
     ).trim();
     const deviceHash = normalizeDeviceHash_(request.deviceHash);
     const product = String(request.product || '').trim();
+    const machineName = normalizeMachineName_(request.machineName);
 
     if (action !== 'activate' && action !== 'validate') {
       return jsonResponse_(false, 'BAD_ACTION', 'Thao tác không hợp lệ.');
@@ -95,7 +99,13 @@ function doPost(e) {
     const lock = LockService.getScriptLock();
     lock.waitLock(10000);
     try {
-      return processLicenseRequest_(action, credential, deviceHash, product);
+      return processLicenseRequest_(
+        action,
+        credential,
+        deviceHash,
+        product,
+        machineName
+      );
     } finally {
       lock.releaseLock();
     }
@@ -109,7 +119,13 @@ function doPost(e) {
   }
 }
 
-function processLicenseRequest_(action, credential, deviceHash, product) {
+function processLicenseRequest_(
+  action,
+  credential,
+  deviceHash,
+  product,
+  machineName
+) {
   ensureLicenseStorageReady_();
   const sheet = getLicenseSheet_();
   const headers = getHeaderMap_(sheet, LICENSE_HEADERS);
@@ -206,7 +222,8 @@ function processLicenseRequest_(action, credential, deviceHash, product) {
         ActivatedUtc: now,
         LastCheckUtc: now,
         RevokedUtc: '',
-        Notes: ''
+        Notes: '',
+        MachineName: machineName
       }
     );
 
@@ -220,6 +237,11 @@ function processLicenseRequest_(action, credential, deviceHash, product) {
   activationSheet
     .getRange(activationRow, activationHeaders.LastCheckUtc)
     .setValue(now);
+  if (machineName) {
+    activationSheet
+      .getRange(activationRow, activationHeaders.MachineName)
+      .setValue(machineName);
+  }
   sheet.getRange(row, headers.LastCheckUtc).setValue(now);
   SpreadsheetApp.flush();
 
@@ -454,7 +476,7 @@ function ensureLicenseStorageReady_() {
 
 function ensureLicenseStorage_() {
   const spreadsheet = getSpreadsheet_();
-  spreadsheet.setSpreadsheetTimeZone('UTC');
+  spreadsheet.setSpreadsheetTimeZone(DISPLAY_TIME_ZONE);
   const licenseSheet = ensureSheet_(
     spreadsheet,
     LICENSE_SHEET_NAME,
@@ -471,6 +493,12 @@ function ensureLicenseStorage_() {
     ACTIVATION_HEADERS
   );
 
+  applyDateFormats_(licenseSheet, licenseHeaders, [
+    'ExpiresUtc', 'ActivatedUtc', 'LastCheckUtc', 'CreatedUtc'
+  ]);
+  applyDateFormats_(activationSheet, activationHeaders, [
+    'ActivatedUtc', 'LastCheckUtc', 'RevokedUtc'
+  ]);
   initializeMaxDevices_(licenseSheet, licenseHeaders);
   migrateLegacyActivations_(
     licenseSheet,
@@ -674,6 +702,7 @@ function formatLicenseSheets_(
       ActivatedUtc: 150,
       LastCheckUtc: 150,
       RevokedUtc: 150,
+      MachineName: 180,
       Notes: 260
     },
     center: ['Status', 'ActivatedUtc', 'LastCheckUtc', 'RevokedUtc'],
@@ -681,6 +710,7 @@ function formatLicenseSheets_(
     mono: ['LicenseId', 'DeviceHash'],
     notes: {
       DeviceHash: 'Mã máy đã kích hoạt.',
+      MachineName: 'Tên máy tính (Windows).',
       Status: 'Active = đang chiếm 1 chỗ, Revoked = đã thu hồi.',
       LastCheckUtc: 'Lần gần nhất máy này xác nhận license.'
     }
@@ -748,7 +778,7 @@ function styleLicenseSheet_(sheet, headers, options) {
   options.dates.forEach(function (name) {
     if (headers[name]) {
       sheet.getRange(2, headers[name], dataRows, 1)
-        .setNumberFormat('yyyy-mm-dd hh:mm');
+        .setNumberFormat(DATE_FORMAT);
     }
   });
   options.mono.forEach(function (name) {
@@ -1510,4 +1540,23 @@ function jsonResponse_(success, code, message, lease, clientCredential) {
 
   return ContentService.createTextOutput(JSON.stringify(body))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function applyDateFormats_(sheet, headers, names) {
+  const rows = Math.max(sheet.getMaxRows() - 1, 1);
+  names.forEach(function (name) {
+    if (headers[name]) {
+      sheet.getRange(2, headers[name], rows, 1)
+        .setNumberFormat(DATE_FORMAT)
+        .setHorizontalAlignment('center');
+    }
+  });
+}
+
+function normalizeMachineName_(value) {
+  return String(value || '')
+    .replace(/[\u0000-\u001F\u007F]/g, '')
+    .replace(/^[=+\-@]+/, '')
+    .trim()
+    .substring(0, 100);
 }

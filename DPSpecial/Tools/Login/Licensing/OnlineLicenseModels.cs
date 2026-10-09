@@ -62,6 +62,9 @@ namespace DPSpecial.Tools.Login.Licensing
         [JsonProperty("product")]
         public string Product { get; set; } = string.Empty;
 
+        [JsonProperty("machineName")]
+        public string MachineName { get; set; } = string.Empty;
+
         [JsonProperty("requestId")]
         public string RequestId { get; set; } = string.Empty;
     }

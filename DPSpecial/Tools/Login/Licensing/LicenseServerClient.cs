@@ -45,6 +45,7 @@ namespace DPSpecial.Tools.Login.Licensing
                 Action = action,
                 Credential = credential,
                 DeviceHash = deviceHash,
+                MachineName = Environment.MachineName,
                 Product = LeaseVerifier.ProductName,
                 RequestId = Guid.NewGuid().ToString("N")
             };
