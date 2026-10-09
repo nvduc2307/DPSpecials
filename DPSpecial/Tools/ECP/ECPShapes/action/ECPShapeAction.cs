@@ -17,8 +17,10 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
         private readonly List<ElementId> _loadedShapeIds = new List<ElementId>();
         private readonly HashSet<string> _missingShapes = new HashSet<string>();
         private readonly Dictionary<string, Group> _shapeCache = new Dictionary<string, Group>();
-        public ECPShapeAction(UIDocument uidocument)
+        private readonly bool _pickWalls;
+        public ECPShapeAction(UIDocument uidocument, bool pickWalls = false)
         {
+            _pickWalls = pickWalls;
             _uidocument = uidocument;
             _document = _uidocument.Document;
             _eCPShapeSchemal = new ECPShapeSchema(ECPShapeSchema.GUID, ECPShapeSchema.NAME);
@@ -40,7 +42,15 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
         {
             try
             {
-                ExecuteCore();
+                ValidateView();
+                if (_pickWalls)
+                {
+                    ExecutePickLoop();
+                }
+                else
+                {
+                    ExecuteCore(GetWallECPs());
+                }
             }
             finally
             {
@@ -49,10 +59,29 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
                 PerfLog.Write($"ECPShape: đóng template {closeWatch.ElapsedMilliseconds} ms");
             }
         }
-        private void ExecuteCore()
+        private void ExecutePickLoop()
         {
-            ValidateView();
-            var walls = GetWallECPs();
+            while (true)
+            {
+                List<FamilyInstance> walls;
+                try
+                {
+                    walls = PickWallECPs();
+                }
+                catch (Autodesk.Revit.Exceptions.OperationCanceledException)
+                {
+                    return;
+                }
+                if (!walls.Any())
+                {
+                    IO.ShowWarning("Không có tường ECP hợp lệ trong các đối tượng đã chọn (tường phải song song với mặt phẳng của view).");
+                    continue;
+                }
+                ExecuteCore(walls);
+            }
+        }
+        private void ExecuteCore(List<FamilyInstance> walls)
+        {
             if (!walls.Any()) return;
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             PerfLog.Write($"ECPShape: bắt đầu, {walls.Count} tường");
@@ -135,12 +164,25 @@ namespace DPSpecial.Tools.ECP.ECPShapes.action
         }
         private List<FamilyInstance> GetWallECPs()
         {
-            var walls = new List<FamilyInstance>();
             var walls_total = new FilteredElementCollector(_document, _document.ActiveView.Id)
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
                 .ToList();
+            return FilterWallECPs(walls_total);
+        }
+        private List<FamilyInstance> PickWallECPs()
+        {
+            var selected = _uidocument.Selection.PickElements(
+                _document,
+                null,
+                x => x is FamilyInstance fi && fi.Symbol.FamilyName.ToUpper().Contains("ECP"),
+                "Chọn các tường ECP cần thêm hình, rồi nhấn Finish");
+            return FilterWallECPs(selected.OfType<FamilyInstance>().ToList());
+        }
+        private List<FamilyInstance> FilterWallECPs(List<FamilyInstance> walls_total)
+        {
+            var walls = new List<FamilyInstance>();
             if(!walls_total.Any()) return walls;
             var walls_ver = walls_total
                 .Where(x => ECPFamilyName.ECPVerticalFamilyName.Any(f=>f == x.Symbol.FamilyName))

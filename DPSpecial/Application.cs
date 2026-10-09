@@ -4,6 +4,7 @@ using DPSpecial.Tools.ECP.ECPCreateSchedule;
 using DPSpecial.Tools.ECP.ECPCreateScheduleOrderDetail;
 using DPSpecial.Tools.ECP.ECPFamilyImport;
 using DPSpecial.Tools.ECP.ECPModifyWidth;
+using DPSpecial.Tools.ECP.ECPShapeSelect;
 using DPSpecial.Tools.ECP.ECPShapes;
 using DPSpecial.Tools.ECP.ECPZoneDimensionUpdate;
 using DPSpecial.Tools.ECP.ECPZoneDimensionUpdateAll;
@@ -89,6 +90,10 @@ namespace DPSpecial
             var panel = Application.CreatePanel("ECP Schedule", "DPSpecial");
 
             panel.AddPushButton<ECPShapeCmd>("shape")
+                .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
+                .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
+
+            panel.AddPushButton<ECPShapeSelectCmd>("shape\nselect")
                 .SetImage("/DPSpecial;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/DPSpecial;component/Resources/Icons/RibbonIcon32.png");
 
